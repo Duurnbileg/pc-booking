@@ -24,8 +24,17 @@ async function main() {
   );
   app.use(express.json());
   app.use(cookieParser());
-  app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
+  app.use(
+    morgan(env.nodeEnv === "production" ? "combined" : "dev", {
+      // Browsers/IDEs probe CDP on the API port; ignore the noise.
+      skip: (req) => req.path === "/json/version" || req.path.startsWith("/json/"),
+    }),
+  );
   app.use(optionalAuth);
+
+  app.get("/", (_req, res) => {
+    res.json({ ok: true, service: "pc-booking-api", health: "/api/health" });
+  });
 
   app.get("/api/health", (_req, res) => {
     res.json({ ok: true, service: "pc-booking-api" });
@@ -56,5 +65,11 @@ async function main() {
 
 main().catch((err) => {
   console.error("Failed to start API", err);
+  const message = err instanceof Error ? err.message : String(err);
+  if (message.includes("IP that isn't whitelisted")) {
+    console.error(
+      "\nMongoDB Atlas blocked this machine's IP. In Atlas → Network Access, add your current IP (or 0.0.0.0/0 for local dev), then restart the API.\n",
+    );
+  }
   process.exit(1);
 });

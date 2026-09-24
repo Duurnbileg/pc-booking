@@ -24,7 +24,7 @@ Phase 1 includes auth, cafe listing/detail, PC status display, owner registratio
 pnpm install
 
 cp .env.example apps/api/.env
-# edit apps/api/.env if needed
+# edit apps/api/.env — MONGODB_URI and JWT_SECRET are required
 
 # Start local MongoDB (uses binary downloaded by mongodb-memory-server)
 pnpm mongo
@@ -35,7 +35,23 @@ pnpm dev
 ```
 
 - Web: http://localhost:3000
-- API: http://localhost:4000/api/health
+- API root: http://localhost:4000/ (points to health)
+- API health: http://localhost:4000/api/health
+
+### API env (`apps/api/.env`)
+
+| Variable | Required | Notes |
+|----------|----------|-------|
+| `MONGODB_URI` | yes | Local URI, Atlas URI, or any Mongo connection string |
+| `JWT_SECRET` | yes | Long random secret for auth cookies |
+| `WEB_ORIGIN` | no | Defaults to `http://localhost:3000` (CORS) |
+| `PORT` | no | Defaults to `4000` |
+| `USE_MEMORY_DB` | no | Set `true` for in-memory Mongo (local demo) |
+| `COOKIE_SECURE` | no | Set `true` in production (HTTPS) |
+
+Web also needs `apps/web/.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:4000` (see `.env.example`).
+
+If the API fails to start with an Atlas “IP that isn't whitelisted” error, add your current IP in Atlas → Network Access (or `0.0.0.0/0` for local dev), then restart.
 
 ## Seed accounts
 
@@ -69,6 +85,7 @@ Seed also creates 3 approved Ulaanbaatar cafes with PCs (mixed statuses) and 1 p
 
 ## Phase 1 API
 
+- `GET /` · `GET /api/health`
 - `POST /api/auth/register|login|logout` · `GET /api/auth/me`
 - `GET/POST/PATCH /api/cafes` · `GET /api/cafes/:idOrSlug` · `GET /api/cafes/:id/pcs`
 - `GET /api/pcs/:id`
