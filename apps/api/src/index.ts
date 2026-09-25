@@ -6,9 +6,9 @@ import { env } from "./config/env.js";
 import { connectDb } from "./db.js";
 import { authRouter } from "./routes/auth.js";
 import { cafesRouter } from "./routes/cafes.js";
-import { pcsRouter } from "./routes/pcs.js";
 import { adminRouter } from "./routes/admin.js";
 import { ownerRouter } from "./routes/owner.js";
+import { uploadRouter } from "./routes/upload.js";
 import { optionalAuth } from "./middleware/auth.js";
 
 async function main() {
@@ -42,9 +42,9 @@ async function main() {
 
   app.use("/api/auth", authRouter);
   app.use("/api/cafes", cafesRouter);
-  app.use("/api/pcs", pcsRouter);
   app.use("/api/admin", adminRouter);
   app.use("/api/owner", ownerRouter);
+  app.use("/api/upload", uploadRouter);
 
   app.use(
     (

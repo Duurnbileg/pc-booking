@@ -97,9 +97,15 @@ async function seed() {
       address: "Seoul St 15, Sukhbaatar District, Ulaanbaatar",
       phone: "+97670111111",
       pricePerHour: 3000,
+      gear: "Racing chairs, HyperX headsets, Logitech mice",
+      displaySpecs: "Ryzen 5/7 · RTX 3060/4070 · 16–32GB · 144–240Hz",
       coordinates: [106.9177, 47.9184] as [number, number],
       pcCount: 24,
       prefix: "pg",
+      images: [
+        "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80",
+        "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&q=80",
+      ],
     },
     {
       name: "Arena Cyber Cafe",
@@ -108,9 +114,15 @@ async function seed() {
       address: "Peace Avenue 45, Chingeltei District, Ulaanbaatar",
       phone: "+97670112222",
       pricePerHour: 3500,
+      gear: "Streaming mics, dual monitors, mechanical keyboards",
+      displaySpecs: "i5/i7 · RTX 3070 · 32GB · 27\" 165Hz",
       coordinates: [106.9055, 47.9212] as [number, number],
       pcCount: 32,
       prefix: "arena",
+      images: [
+        "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=1200&q=80",
+        "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=1200&q=80",
+      ],
     },
     {
       name: "Night Owl Capsule",
@@ -119,9 +131,14 @@ async function seed() {
       address: "Tokyo St 8, Bayanzurkh District, Ulaanbaatar",
       phone: "+97670113333",
       pricePerHour: 2800,
+      gear: "Private booths, blankets, quiet headsets",
+      displaySpecs: "Ryzen 5 · RTX 3060 · 16GB · 144Hz",
       coordinates: [106.945, 47.911] as [number, number],
       pcCount: 16,
       prefix: "owl",
+      images: [
+        "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=1200&q=80",
+      ],
     },
   ];
 
@@ -132,11 +149,14 @@ async function seed() {
       description: def.description,
       address: def.address,
       phone: def.phone,
-      images: [],
+      images: def.images,
+      gear: def.gear,
+      displaySpecs: def.displaySpecs,
       openingHours: hours(),
       status: "APPROVED",
       ownerId: owner!._id,
       pricePerHour: def.pricePerHour,
+      totalPcs: def.pcCount,
       location: { type: "Point", coordinates: def.coordinates },
     });
 
@@ -158,11 +178,16 @@ async function seed() {
     description: "New cafe awaiting platform approval.",
     address: "Narnii Zam 3, Ulaanbaatar",
     phone: "+97670114444",
-    images: [],
+    images: [
+      "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&q=80",
+    ],
+    gear: "Starter chairs and headsets",
+    displaySpecs: "Ryzen 5 · GTX 1660 · 16GB",
     openingHours: hours(),
     status: "PENDING",
     ownerId: owner!._id,
     pricePerHour: 3200,
+    totalPcs: 12,
     location: { type: "Point", coordinates: [106.91, 47.92] },
   });
 

@@ -2,7 +2,11 @@
 
 Unified customer-facing discovery layer for Mongolian gaming centers.
 
-Phase 1 includes auth, cafe listing/detail, PC status display, owner registration, and admin approval. Booking, QPay, Socket.IO, and live iCafeCloud sync come in later phases.
+Phase 1 is **listing-first**: auth, cafe catalog (images, price, gear, specs, PC count), owner registration, and admin approval. Per-PC live status, booking, QPay, Socket.IO, and iCafeCloud sync come in later phases.
+
+## Repo layout
+
+Work only at the **repository root** (this folder). Apps live under `apps/web`, `apps/api`, and `packages/shared`. Use **pnpm** (not npm).
 
 ## Stack
 
@@ -25,6 +29,7 @@ pnpm install
 
 cp .env.example apps/api/.env
 # edit apps/api/.env — MONGODB_URI and JWT_SECRET are required
+# set Cloudinary vars for image uploads (rotate keys if they were ever exposed)
 
 # Start local MongoDB (uses binary downloaded by mongodb-memory-server)
 pnpm mongo
@@ -63,15 +68,15 @@ Password for all: `password123`
 | Cafe owner | `owner@pcbooking.mn` |
 | Customer | `customer@pcbooking.mn` |
 
-Seed also creates 3 approved Ulaanbaatar cafes with PCs (mixed statuses) and 1 pending cafe for the admin approve flow.
+Seed also creates 3 approved Ulaanbaatar cafes (with sample images + PC count) and 1 pending cafe for the admin approve flow.
 
 ## Smoke checklist
 
-1. Open `/` — see approved cafes
-2. Open a cafe — see PC grid with status badges
+1. Open `/` — see approved cafes with images
+2. Open a cafe — see listing details (gear, specs, hours) — live PC grid is Phase 2+
 3. Register / log in as customer
 4. Log in as owner → `/owner/cafes/new` → submit cafe
-5. Log in as admin → `/admin/cafes` → approve
+5. Log in as admin → `/admin/cafes` → approve / reject
 6. Approved cafe appears on `/`
 
 ## Workspace scripts
@@ -87,9 +92,12 @@ Seed also creates 3 approved Ulaanbaatar cafes with PCs (mixed statuses) and 1 p
 
 - `GET /` · `GET /api/health`
 - `POST /api/auth/register|login|logout` · `GET /api/auth/me`
-- `GET/POST/PATCH /api/cafes` · `GET /api/cafes/:idOrSlug` · `GET /api/cafes/:id/pcs`
-- `GET /api/pcs/:id`
+- `GET/POST/PATCH /api/cafes` · `GET /api/cafes/:idOrSlug`
 - `GET /api/owner/cafes` · `GET /api/owner/cafes/:id`
-- `GET /api/admin/cafes/pending` · `POST /api/admin/cafes/:id/approve`
+- `GET /api/admin/cafes` · `GET /api/admin/cafes/pending`
+- `POST /api/admin/cafes/:id/approve|reject|suspend`
+- `POST /api/upload` (owner/admin Cloudinary images)
+
+Phase 2+: per-PC inventory (`/api/pcs`), live status, booking.
 
 Integration adapters live under `apps/api/src/integrations/` (`MockCafeAdapter`, `ICafeCloudAdapter` stub).

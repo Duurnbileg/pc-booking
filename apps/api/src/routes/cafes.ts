@@ -8,7 +8,7 @@ import {
 import { Cafe } from "../models/Cafe.js";
 import { PC } from "../models/PC.js";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
-import { serializeCafe, serializePc } from "../utils/serialize.js";
+import { serializeCafe } from "../utils/serialize.js";
 
 export const cafesRouter = Router();
 
@@ -32,34 +32,10 @@ cafesRouter.get("/", async (req, res) => {
     ];
   }
 
-  const cafes = await Cafe.find(filter).sort({ createdAt: -1 }).lean();
-  const cafeIds = cafes.map((c) => c._id);
-  const counts = await PC.aggregate<{ _id: mongoose.Types.ObjectId; count: number }>([
-    { $match: { cafeId: { $in: cafeIds } } },
-    { $group: { _id: "$cafeId", count: { $sum: 1 } } },
-  ]);
-  const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
-
+  const cafes = await Cafe.find(filter).sort({ createdAt: -1 });
   res.json({
-    cafes: cafes.map((c) =>
-      serializeCafe(c as never, countMap.get(c._id.toString()) ?? 0),
-    ),
+    cafes: cafes.map((c) => serializeCafe(c)),
   });
-});
-
-cafesRouter.get("/:cafeId/pcs", async (req, res) => {
-  const { cafeId } = req.params;
-  const cafe = mongoose.isValidObjectId(cafeId)
-    ? await Cafe.findById(cafeId)
-    : await Cafe.findOne({ slug: cafeId });
-
-  if (!cafe || cafe.status !== "APPROVED") {
-    res.status(404).json({ error: "Cafe not found" });
-    return;
-  }
-
-  const pcs = await PC.find({ cafeId: cafe._id }).sort({ name: 1 });
-  res.json({ pcs: pcs.map(serializePc) });
 });
 
 cafesRouter.get("/:idOrSlug", async (req, res) => {
@@ -74,16 +50,12 @@ cafesRouter.get("/:idOrSlug", async (req, res) => {
     return;
   }
 
-  // Public may only see APPROVED; owners/admins handled via auth header later — keep simple:
-  // Allow PENDING/SUSPENDED only if requester is owner/admin (optionalAuth not wired here).
-  // For Phase 1: public detail only for APPROVED.
   if (cafe.status !== "APPROVED") {
     res.status(404).json({ error: "Cafe not found" });
     return;
   }
 
-  const pcCount = await PC.countDocuments({ cafeId: cafe._id });
-  res.json({ cafe: serializeCafe(cafe, pcCount) });
+  res.json({ cafe: serializeCafe(cafe) });
 });
 
 cafesRouter.post(
@@ -93,7 +65,9 @@ cafesRouter.post(
   async (req, res) => {
     const parsed = CreateCafeSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      });
       return;
     }
 
@@ -106,8 +80,11 @@ cafesRouter.post(
       address: data.address,
       phone: data.phone,
       images: data.images ?? [],
+      gear: data.gear ?? "",
+      displaySpecs: data.displaySpecs ?? "",
+      totalPcs: data.pcCount ?? 0,
       openingHours: data.openingHours ?? defaultOpeningHours(),
-      status: "PENDING",
+      status: req.user!.role === "ADMIN" ? "APPROVED" : "PENDING",
       ownerId: req.user!.id,
       pricePerHour: data.pricePerHour,
       location: {
@@ -132,8 +109,7 @@ cafesRouter.post(
       );
     }
 
-    const pcCount = await PC.countDocuments({ cafeId: cafe._id });
-    res.status(201).json({ cafe: serializeCafe(cafe, pcCount) });
+    res.status(201).json({ cafe: serializeCafe(cafe) });
   },
 );
 
@@ -144,7 +120,9 @@ cafesRouter.patch(
   async (req, res) => {
     const parsed = UpdateCafeSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
+      res.status(400).json({
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      });
       return;
     }
 
@@ -169,7 +147,12 @@ cafesRouter.patch(
     if (data.phone !== undefined) cafe.phone = data.phone;
     if (data.pricePerHour !== undefined) cafe.pricePerHour = data.pricePerHour;
     if (data.images !== undefined) cafe.images = data.images;
-    if (data.openingHours !== undefined) cafe.openingHours = data.openingHours as never;
+    if (data.gear !== undefined) cafe.gear = data.gear;
+    if (data.displaySpecs !== undefined) cafe.displaySpecs = data.displaySpecs;
+    if (data.pcCount !== undefined) cafe.totalPcs = data.pcCount;
+    if (data.openingHours !== undefined) {
+      cafe.openingHours = data.openingHours as never;
+    }
     if (data.location) {
       cafe.location = {
         type: "Point",
@@ -178,8 +161,7 @@ cafesRouter.patch(
     }
 
     await cafe.save();
-    const pcCount = await PC.countDocuments({ cafeId: cafe._id });
-    res.json({ cafe: serializeCafe(cafe, pcCount) });
+    res.json({ cafe: serializeCafe(cafe) });
   },
 );
 

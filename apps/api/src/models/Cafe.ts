@@ -30,6 +30,9 @@ const cafeSchema = new Schema(
     },
     phone: { type: String, required: true },
     images: { type: [String], default: [] },
+    gear: { type: String, default: "" },
+    displaySpecs: { type: String, default: "" },
+    totalPcs: { type: Number, min: 0, default: 0 },
     openingHours: { type: [openingHoursSchema], default: [] },
     status: {
       type: String,

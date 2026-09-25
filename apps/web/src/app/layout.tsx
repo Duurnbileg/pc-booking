@@ -5,8 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PCBook — Gaming Center Booking",
-  description: "Discover and book PCs at gaming centers across Mongolia.",
+  title: "PCBook — Gaming Center",
+  description: "Монголын gaming center-үүдийг олж, үнэ · gear · үзүүлэлтээ харьцуулаарай.",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="mn">
       <body>
         <Providers>
           <AuthProvider>

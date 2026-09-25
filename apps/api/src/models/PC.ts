@@ -12,6 +12,14 @@ const pcSchema = new Schema(
     externalId: { type: String },
     name: { type: String, required: true, trim: true },
     zone: { type: String },
+    location: { type: String, default: "" },
+    gear: { type: String, default: "" },
+    displaySpecs: { type: String, default: "" },
+    images: { type: [String], default: [] },
+    hasVip: { type: Boolean, default: false },
+    vipPrice: { type: Number, min: 0 },
+    stagePrice: { type: Number, min: 0 },
+    hallPrice: { type: Number, min: 0 },
     status: {
       type: String,
       enum: [

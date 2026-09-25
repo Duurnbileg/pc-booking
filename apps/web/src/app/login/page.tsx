@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, type ReactNode } from "react";
 import { API_PATHS } from "@pc-booking/shared";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import type { PublicUser } from "@/lib/types";
+import { useT } from "@/components/locale-provider";
 
 export default function LoginPage() {
   const router = useRouter();
   const { setUser } = useAuth();
+  const t = useT();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export default function LoginPage() {
       setUser(data.user);
       router.push("/");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Login failed");
+      setError(err instanceof ApiError ? err.message : t("auth.loginFailed"));
     } finally {
       setPending(false);
     }
@@ -36,9 +38,9 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-6">
-      <h1 className="font-display text-3xl">Log in</h1>
+      <h1 className="font-display text-3xl">{t("auth.loginTitle")}</h1>
       <form onSubmit={onSubmit} className="space-y-4">
-        <Field label="Email">
+        <Field label={t("auth.email")}>
           <input
             type="email"
             required
@@ -47,7 +49,7 @@ export default function LoginPage() {
             className="field"
           />
         </Field>
-        <Field label="Password">
+        <Field label={t("auth.password")}>
           <input
             type="password"
             required
@@ -62,13 +64,13 @@ export default function LoginPage() {
           disabled={pending}
           className="w-full rounded-lg bg-accent py-3 font-medium text-ink-950 hover:bg-accent-dim disabled:opacity-60"
         >
-          {pending ? "Signing in…" : "Sign in"}
+          {pending ? t("auth.signingIn") : t("auth.signIn")}
         </button>
       </form>
       <p className="text-sm text-ink-500">
-        No account?{" "}
+        {t("auth.noAccount")}{" "}
         <Link href="/register" className="text-accent hover:underline">
-          Sign up
+          {t("auth.signUp")}
         </Link>
       </p>
     </div>
@@ -80,7 +82,7 @@ function Field({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <label className="block space-y-1.5 text-sm">

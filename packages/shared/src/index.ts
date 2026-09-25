@@ -44,7 +44,10 @@ export const CreateCafeSchema = z.object({
   address: z.string().min(1).max(300),
   phone: z.string().min(5).max(30),
   pricePerHour: z.number().min(0),
-  images: z.array(z.string().url()).optional(),
+  gear: z.string().max(2000).optional(),
+  displaySpecs: z.string().max(2000).optional(),
+  pcCount: z.number().int().min(0).optional(),
+  images: z.array(z.string().url()).max(12).optional(),
   openingHours: z.array(OpeningHoursSchema).optional(),
   location: z
     .object({
@@ -94,15 +97,15 @@ export const API_PATHS = {
   cafes: {
     list: "/api/cafes",
     byId: (idOrSlug: string) => `/api/cafes/${idOrSlug}`,
-    pcs: (cafeId: string) => `/api/cafes/${cafeId}/pcs`,
-  },
-  pcs: {
-    byId: (id: string) => `/api/pcs/${id}`,
   },
   admin: {
     approveCafe: (id: string) => `/api/admin/cafes/${id}/approve`,
+    rejectCafe: (id: string) => `/api/admin/cafes/${id}/reject`,
+    suspendCafe: (id: string) => `/api/admin/cafes/${id}/suspend`,
     pendingCafes: "/api/admin/cafes/pending",
+    cafes: "/api/admin/cafes",
   },
+  upload: "/api/upload",
   owner: {
     myCafes: "/api/owner/cafes",
   },
@@ -115,4 +118,13 @@ export function slugify(input: string): string {
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export function defaultOpeningHours(): OpeningHours[] {
+  return Array.from({ length: 7 }, (_, day) => ({
+    day,
+    open: "10:00",
+    close: "02:00",
+    closed: false,
+  }));
 }

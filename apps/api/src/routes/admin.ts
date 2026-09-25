@@ -1,7 +1,6 @@
 import { Router } from "express";
 import mongoose from "mongoose";
 import { Cafe } from "../models/Cafe.js";
-import { PC } from "../models/PC.js";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
 import { serializeCafe } from "../utils/serialize.js";
 
@@ -11,15 +10,15 @@ adminRouter.use(requireAuth, requireRoles("ADMIN"));
 
 adminRouter.get("/cafes/pending", async (_req, res) => {
   const cafes = await Cafe.find({ status: "PENDING" }).sort({ createdAt: -1 });
-  const cafeIds = cafes.map((c) => c._id);
-  const counts = await PC.aggregate<{ _id: mongoose.Types.ObjectId; count: number }>([
-    { $match: { cafeId: { $in: cafeIds } } },
-    { $group: { _id: "$cafeId", count: { $sum: 1 } } },
-  ]);
-  const countMap = new Map(counts.map((c) => [c._id.toString(), c.count]));
-
   res.json({
-    cafes: cafes.map((c) => serializeCafe(c, countMap.get(c._id.toString()) ?? 0)),
+    cafes: cafes.map((c) => serializeCafe(c)),
+  });
+});
+
+adminRouter.get("/cafes", async (_req, res) => {
+  const cafes = await Cafe.find().sort({ name: 1 });
+  res.json({
+    cafes: cafes.map((c) => serializeCafe(c)),
   });
 });
 
@@ -37,6 +36,43 @@ adminRouter.post("/cafes/:id/approve", async (req, res) => {
 
   cafe.status = "APPROVED";
   await cafe.save();
-  const pcCount = await PC.countDocuments({ cafeId: cafe._id });
-  res.json({ cafe: serializeCafe(cafe, pcCount) });
+  res.json({ cafe: serializeCafe(cafe) });
+});
+
+/** Reject a pending cafe by deleting it. */
+adminRouter.post("/cafes/:id/reject", async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).json({ error: "Invalid cafe id" });
+    return;
+  }
+
+  const cafe = await Cafe.findById(req.params.id);
+  if (!cafe) {
+    res.status(404).json({ error: "Cafe not found" });
+    return;
+  }
+  if (cafe.status !== "PENDING") {
+    res.status(400).json({ error: "Only pending cafes can be rejected" });
+    return;
+  }
+
+  await cafe.deleteOne();
+  res.json({ ok: true });
+});
+
+adminRouter.post("/cafes/:id/suspend", async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).json({ error: "Invalid cafe id" });
+    return;
+  }
+
+  const cafe = await Cafe.findById(req.params.id);
+  if (!cafe) {
+    res.status(404).json({ error: "Cafe not found" });
+    return;
+  }
+
+  cafe.status = "SUSPENDED";
+  await cafe.save();
+  res.json({ cafe: serializeCafe(cafe) });
 });

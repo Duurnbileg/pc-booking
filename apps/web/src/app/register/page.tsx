@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, type ReactNode } from "react";
 import { API_PATHS, type UserRole } from "@pc-booking/shared";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import type { PublicUser } from "@/lib/types";
+import { useT } from "@/components/locale-provider";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { setUser } = useAuth();
+  const t = useT();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -37,7 +39,7 @@ export default function RegisterPage() {
       setUser(data.user);
       router.push(role === "CAFE_OWNER" ? "/owner/cafes/new" : "/");
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Registration failed");
+      setError(err instanceof ApiError ? err.message : t("auth.registerFailed"));
     } finally {
       setPending(false);
     }
@@ -45,9 +47,9 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-md space-y-6">
-      <h1 className="font-display text-3xl">Create account</h1>
+      <h1 className="font-display text-3xl">{t("auth.registerTitle")}</h1>
       <form onSubmit={onSubmit} className="space-y-4">
-        <Field label="Name">
+        <Field label={t("auth.name")}>
           <input
             required
             value={name}
@@ -55,7 +57,7 @@ export default function RegisterPage() {
             className="field"
           />
         </Field>
-        <Field label="Email">
+        <Field label={t("auth.email")}>
           <input
             type="email"
             required
@@ -64,7 +66,7 @@ export default function RegisterPage() {
             className="field"
           />
         </Field>
-        <Field label="Phone (optional)">
+        <Field label={t("auth.phoneOptional")}>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
@@ -72,7 +74,7 @@ export default function RegisterPage() {
             placeholder="+976…"
           />
         </Field>
-        <Field label="Password">
+        <Field label={t("auth.password")}>
           <input
             type="password"
             required
@@ -82,14 +84,14 @@ export default function RegisterPage() {
             className="field"
           />
         </Field>
-        <Field label="I am a">
+        <Field label={t("auth.roleLabel")}>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as UserRole)}
             className="field"
           >
-            <option value="CUSTOMER">Customer</option>
-            <option value="CAFE_OWNER">Cafe owner</option>
+            <option value="CUSTOMER">{t("auth.roleCustomer")}</option>
+            <option value="CAFE_OWNER">{t("auth.roleOwner")}</option>
           </select>
         </Field>
         {error ? <p className="text-sm text-status-reserved">{error}</p> : null}
@@ -98,26 +100,20 @@ export default function RegisterPage() {
           disabled={pending}
           className="w-full rounded-lg bg-accent py-3 font-medium text-ink-950 hover:bg-accent-dim disabled:opacity-60"
         >
-          {pending ? "Creating…" : "Sign up"}
+          {pending ? t("auth.creating") : t("auth.signUp")}
         </button>
       </form>
       <p className="text-sm text-ink-500">
-        Already have an account?{" "}
+        {t("auth.hasAccount")}{" "}
         <Link href="/login" className="text-accent hover:underline">
-          Log in
+          {t("auth.signIn")}
         </Link>
       </p>
     </div>
   );
 }
 
-function Field({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block space-y-1.5 text-sm">
       <span className="text-ink-300">{label}</span>

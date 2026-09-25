@@ -7,8 +7,19 @@ import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
 import { formatMnt } from "@/lib/utils";
+import { useT } from "@/components/locale-provider";
+
+function cafeBlurb(cafe: Cafe): string {
+  const parts: string[] = [];
+  if (cafe.address) parts.push(cafe.address);
+  if (cafe.gear) parts.push(cafe.gear);
+  if (cafe.displaySpecs) parts.push(cafe.displaySpecs);
+  if (!parts.length && cafe.description) return cafe.description;
+  return parts.join(" · ");
+}
 
 export default function HomePage() {
+  const t = useT();
   const [q, setQ] = useState("");
   const [submitted, setSubmitted] = useState("");
 
@@ -22,9 +33,9 @@ export default function HomePage() {
 
   const cafes = data?.cafes ?? [];
   const subtitle = useMemo(() => {
-    if (submitted) return `Results for “${submitted}”`;
-    return "Popular gaming centers in Ulaanbaatar";
-  }, [submitted]);
+    if (submitted) return t("home.subtitleResults", { q: submitted });
+    return t("home.subtitleDefault");
+  }, [submitted, t]);
 
   return (
     <div className="space-y-10">
@@ -32,9 +43,7 @@ export default function HomePage() {
         <p className="font-display text-4xl sm:text-5xl tracking-tight text-ink-100">
           PC<span className="text-accent">Book</span>
         </p>
-        <h1 className="text-xl text-ink-300 max-w-xl">
-          Find a gaming center, check live PC availability, and book a seat.
-        </h1>
+        <h1 className="text-xl text-ink-300 max-w-xl">{t("home.tagline")}</h1>
         <form
           className="flex flex-col sm:flex-row gap-2 max-w-xl"
           onSubmit={(e) => {
@@ -45,55 +54,87 @@ export default function HomePage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search gaming center…"
+            placeholder={t("home.searchPlaceholder")}
             className="flex-1 rounded-lg border border-ink-700 bg-ink-900/80 px-4 py-3 text-ink-100 placeholder:text-ink-500 focus:border-accent"
           />
           <button
             type="submit"
             className="rounded-lg bg-accent px-5 py-3 font-medium text-ink-950 hover:bg-accent-dim transition"
           >
-            Search
+            {t("home.search")}
           </button>
         </form>
       </section>
 
-      <section className="space-y-4">
+      <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-2xl text-ink-100">{subtitle}</h2>
-          <span className="text-sm text-ink-500">{cafes.length} centers</span>
+          <span className="text-sm text-ink-500">
+            {t("home.centersCount", { n: cafes.length })}
+          </span>
         </div>
 
         {isLoading ? (
-          <p className="text-ink-500">Loading cafes…</p>
+          <p className="text-ink-500">{t("home.loading")}</p>
         ) : error ? (
-          <p className="text-status-reserved">
-            Could not load cafes. Is the API running on port 4000?
-          </p>
+          <p className="text-status-reserved">{t("home.loadError")}</p>
         ) : cafes.length === 0 ? (
-          <p className="text-ink-500">No approved gaming centers found.</p>
+          <p className="text-ink-500">{t("home.empty")}</p>
         ) : (
-          <ul className="divide-y divide-ink-800 border-y border-ink-800">
-            {cafes.map((cafe) => (
-              <li key={cafe.id}>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {cafes.map((cafe) => {
+              const cover = cafe.images?.[0];
+              const blurb = cafeBlurb(cafe);
+              return (
                 <Link
+                  key={cafe.id}
                   href={`/cafes/${cafe.slug}`}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-5 hover:bg-ink-900/40 -mx-2 px-2 rounded transition"
+                  className="group overflow-hidden rounded-2xl border border-ink-800 bg-ink-900/50 shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition hover:border-accent/40 hover:bg-ink-900/80"
                 >
-                  <div>
-                    <p className="font-display text-lg text-ink-100">{cafe.name}</p>
-                    <p className="text-sm text-ink-500">{cafe.address}</p>
+                  <div className="relative aspect-[4/3] overflow-hidden bg-ink-800">
+                    {cover ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={cover}
+                        alt={cafe.name}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-ink-800 to-ink-950">
+                        <span className="font-display text-2xl text-ink-500">
+                          PC<span className="text-accent/50">Book</span>
+                        </span>
+                      </div>
+                    )}
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink-950/80 to-transparent" />
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-ink-300">
-                    <span>{cafe.pcCount ?? "—"} PCs</span>
-                    <span className="text-accent font-medium">
-                      {formatMnt(cafe.pricePerHour)} / hour
-                    </span>
-                    <span className="text-ink-100">View →</span>
+
+                  <div className="space-y-2 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-display text-lg text-accent transition group-hover:text-accent-dim">
+                        {cafe.name}
+                      </h3>
+                      <p className="shrink-0 text-sm font-medium text-ink-100">
+                        {formatMnt(cafe.pricePerHour)}
+                        <span className="text-ink-500">{t("home.perHour")}</span>
+                      </p>
+                    </div>
+                    <p className="text-xs text-ink-500">
+                      {t("home.pcs", { n: cafe.pcCount ?? 0 })}
+                    </p>
+                    {blurb ? (
+                      <p className="line-clamp-2 text-sm leading-relaxed text-ink-300">
+                        {blurb}
+                      </p>
+                    ) : null}
+                    <p className="pt-1 text-sm text-ink-100 opacity-80 transition group-hover:opacity-100">
+                      {t("home.view")}
+                    </p>
                   </div>
                 </Link>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         )}
       </section>
     </div>
