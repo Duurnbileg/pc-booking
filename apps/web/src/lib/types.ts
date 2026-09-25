@@ -17,6 +17,8 @@ export type Cafe = {
   location: { lng: number | null; lat: number | null };
   phone: string;
   images: string[];
+  gear: string;
+  displaySpecs: string;
   openingHours: OpeningHours[];
   status: CafeStatus;
   ownerId: string;
@@ -29,9 +31,18 @@ export type Cafe = {
 export type CafePc = {
   id: string;
   cafeId: string;
+  cafeName?: string;
   externalId: string | null;
   name: string;
   zone: string | null;
+  location: string;
+  gear: string;
+  displaySpecs: string;
+  images: string[];
+  hasVip: boolean;
+  vipPrice: number | null;
+  stagePrice: number | null;
+  hallPrice: number | null;
   status: PcStatus;
   specifications: {
     cpu?: string;
