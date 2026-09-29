@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 import { env } from "./config/env.js";
 
 let memoryUri: string | null = null;
+let connecting: Promise<typeof mongoose> | null = null;
 
-export async function connectDb(): Promise<typeof mongoose> {
+async function openConnection(): Promise<typeof mongoose> {
   mongoose.set("strictQuery", true);
 
   let uri = env.mongodbUri;
@@ -16,6 +17,18 @@ export async function connectDb(): Promise<typeof mongoose> {
   }
 
   return mongoose.connect(uri);
+}
+
+export async function connectDb(): Promise<typeof mongoose> {
+  if (mongoose.connection.readyState === 1) return mongoose;
+
+  if (!connecting) {
+    connecting = openConnection().catch((err) => {
+      connecting = null;
+      throw err;
+    });
+  }
+  return connecting;
 }
 
 export function getDbUri(): string {

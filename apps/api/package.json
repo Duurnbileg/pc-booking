@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "pnpm --filter @pc-booking/shared build && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "seed": "tsx src/seed.ts",
     "lint": "tsc -p tsconfig.json --noEmit"
