@@ -184,6 +184,28 @@ const mn = {
   common: {
     loading: "Ачаалж байна…",
   },
+  map: {
+    nearMe: "Миний ойролцоо",
+    locating: "Байршил тодорхойлж байна…",
+    radius: "Радиус",
+    km: "{n} км",
+    clear: "Шүүлтүүр арилгах",
+    clickHint: "Газрын зураг дээр дарж хайх цэгээ сонгож болно.",
+    nearResults: "{r} км радиус доторх кафе",
+    distance: "{n} км зайтай",
+    showMap: "Газрын зураг",
+    showList: "Жагсаалт",
+    permissionDenied: "Байршил авах зөвшөөрөл олгогдсонгүй.",
+    geoUnsupported: "Таны хөтөч байршил тодорхойлохыг дэмжихгүй байна.",
+    unavailable: "Газрын зураг ачаалах боломжгүй (API key тохируулаагүй).",
+    directions: "Чиглэл авах →",
+    location: "Байршил",
+    pickHint:
+      "Хаягаа хайх, газрын зураг дээр дарах эсвэл marker-ийг чирж байршлаа тохируулна уу.",
+    useMyLocation: "Миний байршил",
+    noLocation: "Байршил сонгоогүй",
+    searchAddress: "Хаяг хайх…",
+  },
 } as const;
 
 type DictShape = {
@@ -375,6 +397,28 @@ const en: DictShape = {
   common: {
     loading: "Loading…",
   },
+  map: {
+    nearMe: "Near me",
+    locating: "Locating…",
+    radius: "Radius",
+    km: "{n} km",
+    clear: "Clear filter",
+    clickHint: "You can also click the map to set a search point.",
+    nearResults: "Cafes within {r} km",
+    distance: "{n} km away",
+    showMap: "Map",
+    showList: "List",
+    permissionDenied: "Location permission was denied.",
+    geoUnsupported: "Your browser does not support geolocation.",
+    unavailable: "Map unavailable (API key not configured).",
+    directions: "Get directions →",
+    location: "Location",
+    pickHint:
+      "Search your address, click the map, or drag the marker to set the location.",
+    useMyLocation: "Use my location",
+    noLocation: "No location selected",
+    searchAddress: "Search address…",
+  },
 };
 
 export const dictionaries: Record<Locale, DictShape> = { mn, en };
@@ -389,7 +433,8 @@ export type TranslationKey =
   | `form.${Exclude<keyof typeof mn.form, "days">}`
   | `admin.${keyof typeof mn.admin}`
   | `owner.${keyof typeof mn.owner}`
-  | `common.${keyof typeof mn.common}`;
+  | `common.${keyof typeof mn.common}`
+  | `map.${keyof typeof mn.map}`;
 
 export function interpolate(
   template: string,

@@ -12,12 +12,15 @@ import { apiUpload, ApiError } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
 import { useLocale } from "@/components/locale-provider";
 import type { TranslationKey } from "@/lib/i18n/dictionaries";
+import { LocationPicker } from "@/components/maps/location-picker";
+import { cafeLatLng, type LatLng } from "@/components/maps/maps-provider";
 
 export type CafeFormValues = {
   name: string;
   description: string;
   address: string;
   district: District | "";
+  location: LatLng | null;
   phone: string;
   pricePerHour: string;
   pcCount: string;
@@ -40,6 +43,7 @@ export function emptyCafeForm(): CafeFormValues {
     description: "",
     address: "",
     district: "",
+    location: null,
     phone: "",
     pricePerHour: "3000",
     pcCount: "10",
@@ -57,6 +61,7 @@ export function cafeToFormValues(cafe: Cafe): CafeFormValues {
     description: cafe.description ?? "",
     address: cafe.address,
     district: cafe.district ?? "",
+    location: cafeLatLng(cafe.location),
     phone: cafe.phone,
     pricePerHour: String(cafe.pricePerHour),
     pcCount: String(cafe.pcCount ?? 0),
@@ -111,6 +116,7 @@ export async function buildCafePayload(form: CafeFormValues, t: Translate) {
     description: form.description.trim() || undefined,
     address,
     district: form.district || undefined,
+    location: form.location ?? undefined,
     phone,
     pricePerHour,
     pcCount,
@@ -266,6 +272,21 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
             ))}
           </select>
         </label>
+      </div>
+
+      <div className="space-y-1.5">
+        <span className="text-sm font-medium text-ink-100">{t("map.location")}</span>
+        <LocationPicker
+          value={value.location}
+          disabled={disabled}
+          onChange={(location, address) =>
+            onChange({
+              ...value,
+              location,
+              ...(address ? { address } : {}),
+            })
+          }
+        />
       </div>
 
       <label className="block space-y-1.5">

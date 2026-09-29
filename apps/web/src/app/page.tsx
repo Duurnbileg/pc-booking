@@ -1,16 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { districtLabel, formatMnt } from "@/lib/utils";
+import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
 import { CafeGridSkeleton } from "@/components/skeletons";
 import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CafesMap } from "@/components/maps/cafes-map";
+import {
+  getCurrentPosition,
+  type LatLng,
+} from "@/components/maps/maps-provider";
+
+const RADIUS_OPTIONS = [1, 3, 5, 10, 20];
 
 function cafeBlurb(cafe: Cafe): string {
   const parts: string[] = [];
@@ -23,13 +31,49 @@ function cafeBlurb(cafe: Cafe): string {
 
 export default function HomePage() {
   const { t, locale } = useLocale();
+  const [center, setCenter] = useState<LatLng | null>(null);
+  const [radiusKm, setRadiusKm] = useState(5);
+  const [locating, setLocating] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<"list" | "map">("list");
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["cafes"],
-    queryFn: () => api<{ cafes: Cafe[] }>(API_PATHS.cafes.list),
+    queryKey: ["cafes", center?.lat, center?.lng, radiusKm],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (center) {
+        params.set("lat", String(center.lat));
+        params.set("lng", String(center.lng));
+        params.set("radiusKm", String(radiusKm));
+      }
+      const qs = params.toString();
+      return api<{ cafes: Cafe[] }>(
+        `${API_PATHS.cafes.list}${qs ? `?${qs}` : ""}`,
+      );
+    },
+    placeholderData: keepPreviousData,
   });
 
   const cafes = data?.cafes ?? [];
+  const subtitle = center
+    ? t("map.nearResults", { r: radiusKm })
+    : t("home.subtitleDefault");
+
+  async function locateMe() {
+    setGeoError(null);
+    setLocating(true);
+    try {
+      setCenter(await getCurrentPosition());
+    } catch (err) {
+      setGeoError(
+        err instanceof Error && err.message === "unsupported"
+          ? t("map.geoUnsupported")
+          : t("map.permissionDenied"),
+      );
+    } finally {
+      setLocating(false);
+    }
+  }
 
   return (
     <div className="space-y-10">
@@ -39,11 +83,91 @@ export default function HomePage() {
         </p>
         <h1 className="text-xl text-ink-300 max-w-xl">{t("home.tagline")}</h1>
         <SearchBar />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={locateMe}
+            disabled={locating}
+            className={cn(
+              "rounded-lg border px-4 py-2 text-sm transition disabled:opacity-60",
+              center
+                ? "border-accent bg-accent/10 text-accent"
+                : "border-ink-700 text-ink-100 hover:border-accent hover:text-accent",
+            )}
+          >
+            {locating ? t("map.locating") : t("map.nearMe")}
+          </button>
+          <label className="flex items-center gap-2 text-sm text-ink-300">
+            {t("map.radius")}
+            <select
+              value={radiusKm}
+              onChange={(e) => setRadiusKm(Number(e.target.value))}
+              className="rounded-lg border border-ink-700 bg-ink-900/80 px-3 py-2 text-ink-100"
+            >
+              {RADIUS_OPTIONS.map((r) => (
+                <option key={r} value={r}>
+                  {t("map.km", { n: r })}
+                </option>
+              ))}
+            </select>
+          </label>
+          {center ? (
+            <button
+              type="button"
+              onClick={() => setCenter(null)}
+              className="rounded-lg px-3 py-2 text-sm text-ink-500 hover:text-ink-100"
+            >
+              {t("map.clear")}
+            </button>
+          ) : null}
+        </div>
+        {geoError ? (
+          <p className="text-sm text-status-reserved">{geoError}</p>
+        ) : (
+          <p className="text-xs text-ink-500">{t("map.clickHint")}</p>
+        )}
       </section>
 
-      <section className="space-y-5">
+      <div className="flex gap-2 sm:hidden">
+        {(["list", "map"] as const).map((view) => (
+          <button
+            key={view}
+            type="button"
+            onClick={() => setMobileView(view)}
+            className={cn(
+              "flex-1 rounded-lg border px-3 py-2 text-sm",
+              mobileView === view
+                ? "border-accent text-accent"
+                : "border-ink-700 text-ink-300",
+            )}
+          >
+            {view === "list" ? t("map.showList") : t("map.showMap")}
+          </button>
+        ))}
+      </div>
+
+      <CafesMap
+        cafes={cafes}
+        center={center}
+        radiusKm={radiusKm}
+        onPickCenter={(point) => {
+          setGeoError(null);
+          setCenter(point);
+        }}
+        className={cn(
+          "h-[360px] sm:h-[420px]",
+          mobileView === "map" ? "block" : "hidden sm:block",
+        )}
+      />
+
+      <section
+        className={cn(
+          "space-y-5",
+          mobileView === "list" ? "block" : "hidden sm:block",
+        )}
+      >
         <div className="flex items-end justify-between gap-4">
-          <h2 className="font-display text-2xl text-ink-100">{t("home.subtitleDefault")}</h2>
+          <h2 className="font-display text-2xl text-ink-100">{subtitle}</h2>
           {isLoading ? (
             <Skeleton className="h-4 w-16" />
           ) : (
@@ -97,6 +221,12 @@ export default function HomePage() {
                     <p className="text-xs text-ink-500">
                       {t("home.pcs", { n: cafe.pcCount ?? 0 })}
                       {cafe.district ? ` · ${districtLabel(cafe.district, locale)}` : ""}
+                      {typeof cafe.distanceKm === "number" ? (
+                        <span className="text-accent">
+                          {" · "}
+                          {t("map.distance", { n: cafe.distanceKm.toFixed(1) })}
+                        </span>
+                      ) : null}
                     </p>
                     {blurb ? (
                       <p className="line-clamp-2 text-sm leading-relaxed text-ink-300">

@@ -32,6 +32,7 @@ export type Cafe = {
   pricePerHour: number;
   pcCount?: number;
   availablePcs?: number | null;
+  distanceKm?: number;
   createdAt?: string;
   updatedAt?: string;
 };

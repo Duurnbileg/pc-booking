@@ -11,6 +11,11 @@ import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
 import { CafeDetailSkeleton } from "@/components/skeletons";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { cafeLatLng } from "@/components/maps/maps-provider";
+import {
+  CafeLocationMap,
+  directionsUrl,
+} from "@/components/maps/cafe-location-map";
 
 export default function CafeDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -38,6 +43,7 @@ export default function CafeDetailPage() {
   }
 
   const cafe = cafeQuery.data.cafe;
+  const position = cafeLatLng(cafe.location);
 
   return (
     <div className="space-y-10">
@@ -101,6 +107,28 @@ export default function CafeDetailPage() {
           {t("cafe.bookSoon")}
         </button>
       </div>
+
+      {position ? (
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <h2 className="font-display text-xl">{t("map.location")}</h2>
+            <a
+              href={directionsUrl(position)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-accent hover:underline"
+            >
+              {t("map.directions")}
+            </a>
+          </div>
+          <p className="text-sm text-ink-400">{cafe.address}</p>
+          <CafeLocationMap
+            position={position}
+            title={cafe.name}
+            className="h-72"
+          />
+        </section>
+      ) : null}
 
       {cafe.openingHours?.length ? (
         <section className="space-y-2">

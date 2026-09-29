@@ -89,6 +89,19 @@ const SORTS: Record<CafeSort, Record<string, 1 | -1>> = {
   price_desc: { pricePerHour: -1, createdAt: -1 },
 };
 
+function haversineKm(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
 cafesRouter.get("/", async (req, res) => {
   const q = queryString(req.query.q);
   const filter: Record<string, unknown> = { status: "APPROVED" };
@@ -137,10 +150,37 @@ cafesRouter.get("/", async (req, res) => {
 
   if (and.length) filter.$and = and;
 
-  const sortKey = queryString(req.query.sort) as CafeSort;
-  const sort = SORTS[sortKey] ?? SORTS.newest;
+  const lat = queryNumber(req.query.lat);
+  const lng = queryNumber(req.query.lng);
+  const center =
+    lat !== undefined &&
+    lng !== undefined &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lng) <= 180
+      ? { lat, lng }
+      : null;
 
-  const cafes = await Cafe.find(filter).sort(sort);
+  if (center) {
+    const radiusKm = Math.min(
+      Math.max(queryNumber(req.query.radiusKm) ?? 5, 0.1),
+      50,
+    );
+    filter.location = {
+      $nearSphere: {
+        $geometry: { type: "Point", coordinates: [center.lng, center.lat] },
+        $maxDistance: radiusKm * 1000,
+      },
+    };
+  }
+
+  const sortKey = queryString(req.query.sort) as CafeSort;
+  const explicitSort = SORTS[sortKey];
+
+  // $nearSphere already orders by distance; only override when a sort was chosen.
+  const cafes =
+    center && !explicitSort
+      ? await Cafe.find(filter)
+      : await Cafe.find(filter).sort(explicitSort ?? SORTS.newest);
   const counts = await pcCountsByCafe(cafes.map((c) => c._id));
 
   const people = queryNumber(req.query.people);
@@ -156,9 +196,15 @@ cafesRouter.get("/", async (req, res) => {
       : cafes;
 
   res.json({
-    cafes: matched.map((c) =>
-      serializeCafe(c, { availablePcs: counts.get(c._id.toString())?.available }),
-    ),
+    cafes: matched.map((c) => {
+      const serialized = serializeCafe(c, {
+        availablePcs: counts.get(c._id.toString())?.available,
+      });
+      const { lat: cLat, lng: cLng } = serialized.location;
+      if (!center || cLat === null || cLng === null) return serialized;
+      const distanceKm = haversineKm(center, { lat: cLat, lng: cLng });
+      return { ...serialized, distanceKm: Math.round(distanceKm * 100) / 100 };
+    }),
   });
 });
 
