@@ -4,6 +4,7 @@ import { useCallback, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/locale-provider";
 import { SearchFilterPanel } from "@/components/search-filter-panel";
+import { DatePicker } from "@/components/date-picker";
 import {
   MAX_PEOPLE,
   emptySearch,
@@ -80,16 +81,15 @@ export function SearchBar({ initial }: SearchBarProps) {
 
         <Divider />
 
-        <label className="flex items-center gap-2 rounded-xl px-3 py-2 focus-within:bg-ink-800/70">
+        <div className="flex items-center gap-2 rounded-xl px-3 py-2 focus-within:bg-ink-800/70">
           <span className="text-xs text-ink-500">{t("search.date")}</span>
-          <input
-            type="date"
+          <DatePicker
             value={draft.date}
             min={todayIso()}
-            onChange={(e) => setDraft({ ...draft, date: e.target.value || todayIso() })}
-            className="bg-transparent py-1.5 text-sm font-medium text-ink-100 [color-scheme:dark] focus:outline-none"
+            onChange={(date) => setDraft({ ...draft, date })}
+            onOpen={closePanel}
           />
-        </label>
+        </div>
 
         <Divider />
 
