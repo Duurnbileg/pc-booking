@@ -1,4 +1,10 @@
-import type { CafeStatus, OpeningHours, PcStatus, UserRole } from "@pc-booking/shared";
+import type {
+  CafeStatus,
+  District,
+  OpeningHours,
+  PcStatus,
+  UserRole,
+} from "@pc-booking/shared";
 
 export type PublicUser = {
   id: string;
@@ -14,6 +20,7 @@ export type Cafe = {
   slug: string;
   description: string;
   address: string;
+  district: District | null;
   location: { lng: number | null; lat: number | null };
   phone: string;
   images: string[];
@@ -24,6 +31,7 @@ export type Cafe = {
   ownerId: string;
   pricePerHour: number;
   pcCount?: number;
+  availablePcs?: number | null;
   createdAt?: string;
   updatedAt?: string;
 };
