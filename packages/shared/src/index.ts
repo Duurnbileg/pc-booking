@@ -23,6 +23,46 @@ export const OpeningHoursSchema = z.object({
 });
 export type OpeningHours = z.infer<typeof OpeningHoursSchema>;
 
+export const DISTRICTS = [
+  { id: "BAYANGOL", mn: "Баянгол", en: "Bayangol" },
+  { id: "BAYANZURKH", mn: "Баянзүрх", en: "Bayanzurkh" },
+  { id: "CHINGELTEI", mn: "Чингэлтэй", en: "Chingeltei" },
+  { id: "KHAN_UUL", mn: "Хан-Уул", en: "Khan-Uul" },
+  { id: "SONGINOKHAIRKHAN", mn: "Сонгинохайрхан", en: "Songinokhairkhan" },
+  { id: "SUKHBAATAR", mn: "Сүхбаатар", en: "Sukhbaatar" },
+  { id: "NALAIKH", mn: "Налайх", en: "Nalaikh" },
+  { id: "BAGANUUR", mn: "Багануур", en: "Baganuur" },
+  { id: "BAGAKHANGAI", mn: "Багахангай", en: "Bagakhangai" },
+] as const;
+
+export const DISTRICT_IDS = DISTRICTS.map((d) => d.id) as [
+  (typeof DISTRICTS)[number]["id"],
+  ...(typeof DISTRICTS)[number]["id"][],
+];
+export const DistrictSchema = z.enum(DISTRICT_IDS);
+export type District = z.infer<typeof DistrictSchema>;
+
+export const GPU_OPTIONS = [
+  "RTX 4090",
+  "RTX 4080",
+  "RTX 4070",
+  "RTX 3070",
+  "RTX 3060",
+  "GTX 1660",
+] as const;
+
+export const MONITOR_HZ_OPTIONS = ["240Hz", "165Hz", "144Hz"] as const;
+
+export const CAFE_SORTS = ["newest", "price_asc", "price_desc"] as const;
+export type CafeSort = (typeof CAFE_SORTS)[number];
+
+export const PRICE_RANGES = [
+  { id: "UNDER_3000", max: 3000 },
+  { id: "3000_4000", min: 3001, max: 4000 },
+  { id: "OVER_4000", min: 4001 },
+] as const satisfies readonly { id: string; min?: number; max?: number }[];
+export type PriceRangeId = (typeof PRICE_RANGES)[number]["id"];
+
 export const RegisterSchema = z.object({
   name: z.string().min(1).max(100),
   email: z.string().email(),
@@ -42,6 +82,7 @@ export const CreateCafeSchema = z.object({
   name: z.string().min(1).max(120),
   description: z.string().max(2000).optional(),
   address: z.string().min(1).max(300),
+  district: DistrictSchema.optional(),
   phone: z.string().min(5).max(30),
   pricePerHour: z.number().min(0),
   gear: z.string().max(2000).optional(),
@@ -97,6 +138,7 @@ export const API_PATHS = {
   cafes: {
     list: "/api/cafes",
     byId: (idOrSlug: string) => `/api/cafes/${idOrSlug}`,
+    pcs: (idOrSlug: string) => `/api/cafes/${idOrSlug}/pcs`,
   },
   admin: {
     approveCafe: (id: string) => `/api/admin/cafes/${id}/approve`,

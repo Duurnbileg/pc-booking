@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { formatMnt } from "@/lib/utils";
-import { useT } from "@/components/locale-provider";
+import { districtLabel, formatMnt } from "@/lib/utils";
+import { useLocale } from "@/components/locale-provider";
+import { SearchBar } from "@/components/search-bar";
 
 function cafeBlurb(cafe: Cafe): string {
   const parts: string[] = [];
@@ -19,23 +19,14 @@ function cafeBlurb(cafe: Cafe): string {
 }
 
 export default function HomePage() {
-  const t = useT();
-  const [q, setQ] = useState("");
-  const [submitted, setSubmitted] = useState("");
+  const { t, locale } = useLocale();
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["cafes", submitted],
-    queryFn: () =>
-      api<{ cafes: Cafe[] }>(
-        `${API_PATHS.cafes.list}${submitted ? `?q=${encodeURIComponent(submitted)}` : ""}`,
-      ),
+    queryKey: ["cafes"],
+    queryFn: () => api<{ cafes: Cafe[] }>(API_PATHS.cafes.list),
   });
 
   const cafes = data?.cafes ?? [];
-  const subtitle = useMemo(() => {
-    if (submitted) return t("home.subtitleResults", { q: submitted });
-    return t("home.subtitleDefault");
-  }, [submitted, t]);
 
   return (
     <div className="space-y-10">
@@ -44,31 +35,12 @@ export default function HomePage() {
           PC<span className="text-accent">Book</span>
         </p>
         <h1 className="text-xl text-ink-300 max-w-xl">{t("home.tagline")}</h1>
-        <form
-          className="flex flex-col sm:flex-row gap-2 max-w-xl"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSubmitted(q.trim());
-          }}
-        >
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t("home.searchPlaceholder")}
-            className="flex-1 rounded-lg border border-ink-700 bg-ink-900/80 px-4 py-3 text-ink-100 placeholder:text-ink-500 focus:border-accent"
-          />
-          <button
-            type="submit"
-            className="rounded-lg bg-accent px-5 py-3 font-medium text-ink-950 hover:bg-accent-dim transition"
-          >
-            {t("home.search")}
-          </button>
-        </form>
+        <SearchBar />
       </section>
 
       <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
-          <h2 className="font-display text-2xl text-ink-100">{subtitle}</h2>
+          <h2 className="font-display text-2xl text-ink-100">{t("home.subtitleDefault")}</h2>
           <span className="text-sm text-ink-500">
             {t("home.centersCount", { n: cafes.length })}
           </span>
@@ -121,6 +93,7 @@ export default function HomePage() {
                     </div>
                     <p className="text-xs text-ink-500">
                       {t("home.pcs", { n: cafe.pcCount ?? 0 })}
+                      {cafe.district ? ` · ${districtLabel(cafe.district, locale)}` : ""}
                     </p>
                     {blurb ? (
                       <p className="line-clamp-2 text-sm leading-relaxed text-ink-300">

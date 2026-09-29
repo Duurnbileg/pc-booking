@@ -1,7 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { API_PATHS, defaultOpeningHours, type OpeningHours } from "@pc-booking/shared";
+import {
+  API_PATHS,
+  DISTRICTS,
+  defaultOpeningHours,
+  type District,
+  type OpeningHours,
+} from "@pc-booking/shared";
 import { apiUpload, ApiError } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
 import { useLocale } from "@/components/locale-provider";
@@ -11,6 +17,7 @@ export type CafeFormValues = {
   name: string;
   description: string;
   address: string;
+  district: District | "";
   phone: string;
   pricePerHour: string;
   pcCount: string;
@@ -32,6 +39,7 @@ export function emptyCafeForm(): CafeFormValues {
     name: "",
     description: "",
     address: "",
+    district: "",
     phone: "",
     pricePerHour: "3000",
     pcCount: "10",
@@ -48,6 +56,7 @@ export function cafeToFormValues(cafe: Cafe): CafeFormValues {
     name: cafe.name,
     description: cafe.description ?? "",
     address: cafe.address,
+    district: cafe.district ?? "",
     phone: cafe.phone,
     pricePerHour: String(cafe.pricePerHour),
     pcCount: String(cafe.pcCount ?? 0),
@@ -101,6 +110,7 @@ export async function buildCafePayload(form: CafeFormValues, t: Translate) {
     name,
     description: form.description.trim() || undefined,
     address,
+    district: form.district || undefined,
     phone,
     pricePerHour,
     pcCount,
@@ -118,7 +128,7 @@ type CafeFormProps = {
 };
 
 export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
-  const { t, days } = useLocale();
+  const { t, days, locale } = useLocale();
 
   const previewItems = useMemo(
     () => [
@@ -229,16 +239,34 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
         </label>
       </div>
 
-      <label className="block space-y-1.5">
-        <span className="text-sm font-medium text-ink-100">{t("form.address")}</span>
-        <input
-          required
-          disabled={disabled}
-          value={value.address}
-          onChange={(e) => set("address", e.target.value)}
-          className={inputClass}
-        />
-      </label>
+      <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium text-ink-100">{t("form.address")}</span>
+          <input
+            required
+            disabled={disabled}
+            value={value.address}
+            onChange={(e) => set("address", e.target.value)}
+            className={inputClass}
+          />
+        </label>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium text-ink-100">{t("form.district")}</span>
+          <select
+            disabled={disabled}
+            value={value.district}
+            onChange={(e) => set("district", e.target.value as District | "")}
+            className={inputClass}
+          >
+            <option value="">{t("form.districtPlaceholder")}</option>
+            {DISTRICTS.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d[locale]}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
       <label className="block space-y-1.5">
         <span className="text-sm font-medium text-ink-100">{t("form.description")}</span>

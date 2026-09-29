@@ -1,14 +1,21 @@
 import type { CafeDocument } from "../models/Cafe.js";
 import type { PcDocument } from "../models/PC.js";
 
-/** Phase 1: pcCount is the declared totalPcs on the cafe, not a live PC inventory count. */
-export function serializeCafe(cafe: CafeDocument, _pcCount?: number) {
+/**
+ * pcCount is the declared totalPcs on the cafe. availablePcs counts PC records with
+ * AVAILABLE status (null when the cafe has no PC records yet).
+ */
+export function serializeCafe(
+  cafe: CafeDocument,
+  options: { availablePcs?: number | null } = {},
+) {
   return {
     id: cafe._id.toString(),
     name: cafe.name,
     slug: cafe.slug,
     description: cafe.description,
     address: cafe.address,
+    district: cafe.district ?? null,
     location: {
       lng: cafe.location?.coordinates?.[0] ?? null,
       lat: cafe.location?.coordinates?.[1] ?? null,
@@ -22,6 +29,7 @@ export function serializeCafe(cafe: CafeDocument, _pcCount?: number) {
     ownerId: cafe.ownerId.toString(),
     pricePerHour: cafe.pricePerHour,
     pcCount: typeof cafe.totalPcs === "number" ? cafe.totalPcs : 0,
+    availablePcs: options.availablePcs ?? null,
     createdAt: cafe.createdAt,
     updatedAt: cafe.updatedAt,
   };

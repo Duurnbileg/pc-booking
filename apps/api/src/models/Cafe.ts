@@ -1,5 +1,5 @@
 import mongoose, { Schema, type InferSchemaType, type Model } from "mongoose";
-import type { CafeStatus } from "@pc-booking/shared";
+import { DISTRICT_IDS, type CafeStatus } from "@pc-booking/shared";
 
 const openingHoursSchema = new Schema(
   {
@@ -17,6 +17,7 @@ const cafeSchema = new Schema(
     slug: { type: String, required: true, unique: true, index: true },
     description: { type: String, default: "" },
     address: { type: String, required: true },
+    district: { type: String, enum: DISTRICT_IDS, index: true },
     location: {
       type: {
         type: String,

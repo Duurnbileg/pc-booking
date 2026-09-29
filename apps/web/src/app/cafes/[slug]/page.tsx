@@ -6,13 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { formatMnt } from "@/lib/utils";
+import { districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
+import { PcSeatMap } from "@/components/pc-seat-map";
 
 export default function CafeDetailPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
-  const { t, days } = useLocale();
+  const { t, days, locale } = useLocale();
 
   const cafeQuery = useQuery({
     queryKey: ["cafe", slug],
@@ -47,6 +48,9 @@ export default function CafeDetailPage() {
           <p className="max-w-2xl text-ink-300">{cafe.description}</p>
         ) : null}
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-400">
+          {cafe.district ? (
+            <span className="text-accent">{districtLabel(cafe.district, locale)}</span>
+          ) : null}
           <span>{cafe.address}</span>
           <a href={`tel:${cafe.phone}`} className="hover:text-accent">
             {cafe.phone}
@@ -85,6 +89,9 @@ export default function CafeDetailPage() {
             ))}
           </div>
         ) : null}
+        <div className="pt-2">
+          <PcSeatMap slug={cafe.slug} />
+        </div>
         <button
           type="button"
           disabled
