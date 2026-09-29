@@ -54,9 +54,44 @@ pnpm dev
 | `USE_MEMORY_DB` | no | Set `true` for in-memory Mongo (local demo) |
 | `COOKIE_SECURE` | no | Set `true` in production (HTTPS) |
 
-Web also needs `apps/web/.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:4000` (see `.env.example`).
+The web app needs no env file locally: it proxies `/api/*` to `http://localhost:4000` in dev. Override with `API_PROXY_TARGET` in `apps/web/.env.local` if needed.
 
 If the API fails to start with an Atlas “IP that isn't whitelisted” error, add your current IP in Atlas → Network Access (or `0.0.0.0/0` for local dev), then restart.
+
+## Deploy to Vercel
+
+Deploy as **two Vercel projects** from the same repo. The web app proxies `/api/*` to the API, so the browser only talks to the web origin and auth cookies stay first-party.
+
+**API project**
+
+- Root Directory: `apps/api`, Framework Preset: Other (build settings come from `apps/api/vercel.json`)
+- Env vars:
+
+| Variable | Value |
+|----------|-------|
+| `MONGODB_URI` | Atlas connection string |
+| `JWT_SECRET` | Long random secret |
+| `COOKIE_SECURE` | `true` |
+| `NODE_ENV` | `production` |
+| `WEB_ORIGIN` | Web project URL, e.g. `https://pc-booking.vercel.app` |
+| `CLOUDINARY_URL` | `cloudinary://<api_key>:<api_secret>@<cloud_name>` |
+
+**Web project**
+
+- Root Directory: `apps/web`, Framework Preset: Next.js (build settings come from `apps/web/vercel.json`)
+- Env vars:
+
+| Variable | Value |
+|----------|-------|
+| `API_PROXY_TARGET` | API project URL, no trailing slash, e.g. `https://pc-booking-api.vercel.app` |
+
+Leave `NEXT_PUBLIC_API_URL` unset in production.
+
+**MongoDB Atlas:** in Network Access allow `0.0.0.0/0` (Vercel IPs are dynamic). Seed once from your machine by running `pnpm seed` with `MONGODB_URI` in `apps/api/.env` pointed at Atlas.
+
+**Uploads:** Vercel caps request bodies at 4.5 MB, so the API accepts images up to 4 MB each and the web app uploads them one per request.
+
+Deploy the API first, then set `API_PROXY_TARGET` on the web project, then set `WEB_ORIGIN` on the API and redeploy it.
 
 ## Seed accounts
 
