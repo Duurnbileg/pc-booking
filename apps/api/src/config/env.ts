@@ -40,7 +40,10 @@ export const env = {
   mongodbUri: required("MONGODB_URI"),
   useMemoryDb: process.env.USE_MEMORY_DB === "true",
   jwtSecret: required("JWT_SECRET"),
-  webOrigin: process.env.WEB_ORIGIN ?? "http://localhost:3000",
+  webOrigin: (process.env.WEB_ORIGIN ?? "http://localhost:3000").replace(
+    /\/$/,
+    "",
+  ),
   cookieSecure: process.env.COOKIE_SECURE === "true",
   nodeEnv: process.env.NODE_ENV ?? "development",
   cloudinary: {

@@ -88,12 +88,13 @@ export async function buildCafePayload(form: CafeFormValues, t: Translate) {
     throw new ApiError(t("form.errPcCount"), 400);
   }
 
-  let uploadedUrls: string[] = [];
-  if (form.pendingImages.length) {
+  // One image per request keeps each body under Vercel's 4.5 MB limit.
+  const uploadedUrls: string[] = [];
+  for (const img of form.pendingImages) {
     const body = new FormData();
-    form.pendingImages.forEach((img) => body.append("images", img.file));
+    body.append("images", img.file);
     const result = await apiUpload<{ urls: string[] }>(API_PATHS.upload, body);
-    uploadedUrls = result.urls;
+    uploadedUrls.push(...result.urls);
   }
 
   return {

@@ -8,7 +8,8 @@ export const uploadRouter = Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 8 * 1024 * 1024, files: 8 },
+  // Vercel rejects serverless request bodies over 4.5 MB.
+  limits: { fileSize: 4 * 1024 * 1024, files: 8 },
 });
 
 function configureCloudinary(): boolean {
