@@ -10,6 +10,8 @@ import { useAuth } from "@/components/auth-provider";
 import type { Cafe } from "@/lib/types";
 import { formatMnt } from "@/lib/utils";
 import { useT } from "@/components/locale-provider";
+import { CafeGridSkeleton, PageSkeleton } from "@/components/skeletons";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import {
   CafeFormFields,
   buildCafePayload,
@@ -121,7 +123,7 @@ export default function AdminCafesCatalogPage() {
   });
 
   if (loading || !user) {
-    return <p className="text-ink-500">{t("admin.loading")}</p>;
+    return <PageSkeleton />;
   }
 
   const saving = saveMutation.isPending;
@@ -144,7 +146,7 @@ export default function AdminCafesCatalogPage() {
       </div>
 
       {cafesQuery.isLoading ? (
-        <p className="text-ink-500">{t("admin.loadingCafes")}</p>
+        <CafeGridSkeleton count={6} />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <button
@@ -168,11 +170,14 @@ export default function AdminCafesCatalogPage() {
               >
                 <div className="relative aspect-[4/3] bg-ink-800">
                   {cover ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <ImageWithSkeleton
                       src={cover}
                       alt={cafe.name}
-                      className="h-full w-full object-cover"
+                      fallback={
+                        <div className="flex h-full items-center justify-center text-sm text-ink-500">
+                          {t("home.noImage")}
+                        </div>
+                      }
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-ink-500">

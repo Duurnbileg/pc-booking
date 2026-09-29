@@ -8,6 +8,9 @@ import type { Cafe } from "@/lib/types";
 import { districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
+import { CafeGridSkeleton } from "@/components/skeletons";
+import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function cafeBlurb(cafe: Cafe): string {
   const parts: string[] = [];
@@ -41,13 +44,17 @@ export default function HomePage() {
       <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-2xl text-ink-100">{t("home.subtitleDefault")}</h2>
-          <span className="text-sm text-ink-500">
-            {t("home.centersCount", { n: cafes.length })}
-          </span>
+          {isLoading ? (
+            <Skeleton className="h-4 w-16" />
+          ) : (
+            <span className="text-sm text-ink-500">
+              {t("home.centersCount", { n: cafes.length })}
+            </span>
+          )}
         </div>
 
         {isLoading ? (
-          <p className="text-ink-500">{t("home.loading")}</p>
+          <CafeGridSkeleton count={6} />
         ) : error ? (
           <p className="text-status-reserved">{t("home.loadError")}</p>
         ) : cafes.length === 0 ? (
@@ -65,18 +72,14 @@ export default function HomePage() {
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-ink-800">
                     {cover ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <ImageWithSkeleton
                         src={cover}
                         alt={cafe.name}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                        className="transition-[opacity,transform] group-hover:scale-[1.03]"
+                        fallback={<CafeCoverFallback />}
                       />
                     ) : (
-                      <div className="flex h-full items-center justify-center bg-gradient-to-br from-ink-800 to-ink-950">
-                        <span className="font-display text-2xl text-ink-500">
-                          PC<span className="text-accent/50">Book</span>
-                        </span>
-                      </div>
+                      <CafeCoverFallback />
                     )}
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink-950/80 to-transparent" />
                   </div>

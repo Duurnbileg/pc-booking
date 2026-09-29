@@ -12,6 +12,9 @@ import { parseSearch, searchToParams, todayIso, type CafeSearch } from "@/lib/se
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
 import { SearchSidebar } from "@/components/search-sidebar";
+import { ResultListSkeleton } from "@/components/skeletons";
+import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
   return (
@@ -56,10 +59,14 @@ function SearchResults() {
               <h1 className="font-display text-2xl text-ink-100">
                 {search.q ? `“${search.q}”` : t("search.title")}
               </h1>
-              <p className="text-sm text-ink-500">
-                {t("search.resultsCount", { n: cafes.length })} ·{" "}
-                {t("search.peopleCount", { n: search.people })} · {search.date}
-              </p>
+              {isLoading ? (
+                <Skeleton className="mt-1.5 h-4 w-48" />
+              ) : (
+                <p className="text-sm text-ink-500">
+                  {t("search.resultsCount", { n: cafes.length })} ·{" "}
+                  {t("search.peopleCount", { n: search.people })} · {search.date}
+                </p>
+              )}
             </div>
             <label className="flex items-center gap-2 rounded-lg border border-ink-700 bg-ink-900/80 px-3 py-2 text-sm">
               <span className="text-ink-500">{t("search.sortLabel")}</span>
@@ -78,7 +85,7 @@ function SearchResults() {
           </div>
 
           {isLoading ? (
-            <p className="text-ink-500">{t("home.loading")}</p>
+            <ResultListSkeleton count={3} />
           ) : error ? (
             <p className="text-status-reserved">{t("home.loadError")}</p>
           ) : cafes.length === 0 ? (
@@ -114,17 +121,15 @@ function ResultCard({ cafe, live }: { cafe: Cafe; live: boolean }) {
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-ink-800 sm:aspect-auto sm:min-h-[200px]">
         {cover ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <ImageWithSkeleton
             src={cover}
             alt={cafe.name}
-            className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="transition-[opacity,transform] group-hover:scale-[1.03]"
+            fallback={<CafeCoverFallback />}
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-ink-800 to-ink-950">
-            <span className="font-display text-2xl text-ink-500">
-              PC<span className="text-accent/50">Book</span>
-            </span>
+          <div className="absolute inset-0">
+            <CafeCoverFallback />
           </div>
         )}
       </div>

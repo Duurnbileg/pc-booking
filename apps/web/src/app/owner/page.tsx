@@ -10,6 +10,7 @@ import { useAuth } from "@/components/auth-provider";
 import type { Cafe } from "@/lib/types";
 import { formatMnt } from "@/lib/utils";
 import { useT } from "@/components/locale-provider";
+import { ListRowsSkeleton, PageSkeleton } from "@/components/skeletons";
 
 export default function OwnerCafesPage() {
   const { user, loading } = useAuth();
@@ -29,7 +30,7 @@ export default function OwnerCafesPage() {
   });
 
   if (loading || !user) {
-    return <p className="text-ink-500">{t("owner.loading")}</p>;
+    return <PageSkeleton />;
   }
 
   return (
@@ -45,7 +46,7 @@ export default function OwnerCafesPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-ink-500">{t("owner.loading")}</p>
+        <ListRowsSkeleton rows={3} />
       ) : error ? (
         <p className="text-status-reserved">{t("owner.loadFailed")}</p>
       ) : !data?.cafes.length ? (

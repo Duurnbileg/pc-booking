@@ -9,6 +9,7 @@ import { useAuth } from "@/components/auth-provider";
 import type { Cafe } from "@/lib/types";
 import { formatMnt } from "@/lib/utils";
 import { useT } from "@/components/locale-provider";
+import { ListRowsSkeleton, PageSkeleton } from "@/components/skeletons";
 
 export default function AdminPendingCafesPage() {
   const { user, loading } = useAuth();
@@ -61,7 +62,7 @@ export default function AdminPendingCafesPage() {
   }
 
   if (loading || !user) {
-    return <p className="text-ink-500">{t("admin.loading")}</p>;
+    return <PageSkeleton />;
   }
 
   return (
@@ -70,7 +71,7 @@ export default function AdminPendingCafesPage() {
       <p className="text-sm text-ink-500">{t("admin.pendingHint")}</p>
       {error ? <p className="text-sm text-status-reserved">{error}</p> : null}
       {isLoading ? (
-        <p className="text-ink-500">{t("admin.loading")}</p>
+        <ListRowsSkeleton rows={3} actions={2} />
       ) : !data?.cafes.length ? (
         <p className="text-ink-500">{t("admin.pendingEmpty")}</p>
       ) : (

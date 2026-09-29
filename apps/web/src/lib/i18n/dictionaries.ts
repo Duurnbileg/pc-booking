@@ -5,7 +5,6 @@ export const LOCALE_STORAGE_KEY = "pcbook-locale";
 
 const mn = {
   nav: {
-    discover: "Discover",
     addCafe: "Кафе нэмэх",
     myCafes: "Миний кафе",
     admin: "Админ",
@@ -13,6 +12,7 @@ const mn = {
     login: "Нэвтрэх",
     register: "Бүртгүүлэх",
     logout: "Гарах",
+    language: "Хэл сонгох",
     langMn: "Монгол",
     langEn: "English",
   },
@@ -132,7 +132,6 @@ const mn = {
     catalogTitle: "Кафе каталог",
     catalogHint: "Зураг, үнэ, үзүүлэлт, gear — PC inventory дараагийн үе шат.",
     pendingLink: "Хүлээгдэж буй →",
-    loadingCafes: "Кафе ачаалж байна…",
     addNew: "Шинэ кафе",
     addHint: "Зураг · үнэ · үзүүлэлт",
     editTitle: "Кафе засах",
@@ -194,7 +193,6 @@ type DictShape = {
 
 const en: DictShape = {
   nav: {
-    discover: "Discover",
     addCafe: "Add cafe",
     myCafes: "My cafes",
     admin: "Admin",
@@ -202,6 +200,7 @@ const en: DictShape = {
     login: "Log in",
     register: "Sign up",
     logout: "Log out",
+    language: "Language",
     langMn: "Mongolian",
     langEn: "English",
   },
@@ -321,7 +320,6 @@ const en: DictShape = {
     catalogTitle: "Cafe catalog",
     catalogHint: "Images, price, specs, gear — PC inventory comes later.",
     pendingLink: "Pending →",
-    loadingCafes: "Loading cafes…",
     addNew: "Add new cafe",
     addHint: "Images · price · specs",
     editTitle: "Edit cafe",
