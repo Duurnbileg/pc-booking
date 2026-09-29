@@ -9,6 +9,8 @@ import type { Cafe } from "@/lib/types";
 import { districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
+import { CafeDetailSkeleton } from "@/components/skeletons";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export default function CafeDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -21,7 +23,7 @@ export default function CafeDetailPage() {
   });
 
   if (cafeQuery.isLoading) {
-    return <p className="text-ink-500">{t("common.loading")}</p>;
+    return <CafeDetailSkeleton />;
   }
 
   if (cafeQuery.error || !cafeQuery.data?.cafe) {
@@ -79,13 +81,12 @@ export default function CafeDetailPage() {
         {cafe.images?.length ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 pt-2">
             {cafe.images.map((url) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <div
                 key={url}
-                src={url}
-                alt=""
-                className="aspect-[4/3] w-full rounded-xl object-cover border border-ink-800"
-              />
+                className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-ink-800 bg-ink-900"
+              >
+                <ImageWithSkeleton src={url} alt="" />
+              </div>
             ))}
           </div>
         ) : null}

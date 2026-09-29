@@ -17,6 +17,7 @@ const config = {
           DEFAULT: "#3ddc97",
           dim: "#2bb87a",
         },
+        muted: "#1a2330",
         status: {
           available: "#3ddc97",
           inuse: "#f5c542",

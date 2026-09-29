@@ -7,6 +7,7 @@ import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import type { Cafe } from "@/lib/types";
 import { useT } from "@/components/locale-provider";
+import { PageSkeleton } from "@/components/skeletons";
 import {
   CafeFormFields,
   buildCafePayload,
@@ -57,7 +58,7 @@ export default function NewCafePage() {
   }
 
   if (loading || !user) {
-    return <p className="text-ink-500">{t("owner.loading")}</p>;
+    return <PageSkeleton className="mx-auto max-w-2xl" />;
   }
 
   return (

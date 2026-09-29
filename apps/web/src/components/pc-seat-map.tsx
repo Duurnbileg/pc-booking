@@ -7,6 +7,7 @@ import type { CafePc } from "@/lib/types";
 import { cn, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PC_STATUS_META, PcStatusLegend } from "@/components/pc-status";
+import { SeatMapSkeleton } from "@/components/skeletons";
 
 type PcsResponse = {
   pcs: CafePc[];
@@ -56,7 +57,7 @@ export function PcSeatMap({ slug }: { slug: string }) {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-ink-500">{t("common.loading")}</p>
+        <SeatMapSkeleton />
       ) : error ? (
         <p className="text-sm text-status-reserved">{t("seat.loadError")}</p>
       ) : !data?.pcs.length ? (
