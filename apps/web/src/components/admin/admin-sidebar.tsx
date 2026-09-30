@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
+import { BrandMark } from "@/components/brand-logo";
 import { useT } from "@/components/locale-provider";
 import { useAdminStats } from "@/hooks/use-admin-queries";
 import type { TranslationKey } from "@/lib/i18n/dictionaries";
@@ -79,11 +80,11 @@ function SidebarContent({
   return (
     <>
       <div className="flex h-16 items-center gap-2 border-b border-slate-200 px-4">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-sm font-semibold text-white">
-          PC
-        </span>
+        <BrandMark size={32} />
         <div className={cn("leading-tight", labelClass)}>
-          <p className="text-sm font-semibold text-slate-900">PCBook</p>
+          <p className="text-sm font-semibold text-slate-900">
+            Pick<span className="text-emerald-600">PC</span>
+          </p>
           <p className="text-xs text-slate-500">{t("dash.adminPanel")}</p>
         </div>
       </div>

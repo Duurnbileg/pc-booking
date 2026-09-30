@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BrandMark } from "@/components/brand-logo";
 import { cn } from "@/lib/utils";
 
 type ImageWithSkeletonProps = {
@@ -15,9 +16,10 @@ type ImageWithSkeletonProps = {
 
 export function CafeCoverFallback() {
   return (
-    <div className="flex h-full items-center justify-center bg-gradient-to-br from-ink-800 to-ink-950">
+    <div className="flex h-full items-center justify-center gap-2 bg-gradient-to-br from-ink-800 to-ink-950">
+      <BrandMark size={28} className="opacity-50" />
       <span className="font-display text-2xl text-ink-500">
-        PC<span className="text-accent/50">Book</span>
+        Pick<span className="text-accent/50">PC</span>
       </span>
     </div>
   );
