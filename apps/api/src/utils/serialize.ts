@@ -24,6 +24,42 @@ export function serializeOwner(user: UserDocument | null | undefined) {
   };
 }
 
+type TierLike = {
+  price?: number | null;
+  pcs?: number | null;
+  gpu?: string | null;
+  cpu?: string | null;
+  ram?: string | null;
+  monitor?: string | null;
+} | null | undefined;
+
+function serializeTier(tier: TierLike, fallbackPrice?: number) {
+  if (!tier) {
+    return fallbackPrice === undefined
+      ? null
+      : { price: fallbackPrice, pcs: 0, gpu: "", cpu: "", ram: "", monitor: "" };
+  }
+  return {
+    price: tier.price ?? fallbackPrice ?? 0,
+    pcs: tier.pcs ?? 0,
+    gpu: tier.gpu ?? "",
+    cpu: tier.cpu ?? "",
+    ram: tier.ram ?? "",
+    monitor: tier.monitor ?? "",
+  };
+}
+
+/**
+ * Cafes created before tiered pricing only have pricePerHour and totalPcs,
+ * so those become the hall price and hall PC count.
+ */
+export function serializePricing(cafe: CafeDocument) {
+  const hall = serializeTier(cafe.pricing?.hall, cafe.pricePerHour)!;
+  const vip = serializeTier(cafe.pricing?.vip);
+  if (hall.pcs + (vip?.pcs ?? 0) === 0) hall.pcs = cafe.totalPcs ?? 0;
+  return { hall, vip };
+}
+
 /**
  * pcCount is the declared totalPcs on the cafe. availablePcs counts PC records with
  * AVAILABLE status (null when the cafe has no PC records yet).
@@ -52,6 +88,7 @@ export function serializeCafe(
     rejectionReason: cafe.rejectionReason ?? "",
     ownerId: cafe.ownerId.toString(),
     pricePerHour: cafe.pricePerHour,
+    pricing: serializePricing(cafe),
     pcCount: typeof cafe.totalPcs === "number" ? cafe.totalPcs : 0,
     availablePcs: options.availablePcs ?? null,
     createdAt: cafe.createdAt,

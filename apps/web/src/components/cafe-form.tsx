@@ -1,16 +1,22 @@
 "use client";
 
 import { useMemo } from "react";
+import { Crown, Monitor, X } from "lucide-react";
 import {
   API_PATHS,
   DISTRICTS,
-  defaultOpeningHours,
   type District,
-  type OpeningHours,
+  type PricingTier,
 } from "@pc-booking/shared";
 import { apiUpload, ApiError } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
+import {
+  TIER_SPECS,
+  TIER_STYLES,
+  type TierVariant,
+} from "@/components/cafe-pricing-cards";
 import type { TranslationKey } from "@/lib/i18n/dictionaries";
 import { LocationPicker } from "@/components/maps/location-picker";
 import { cafeLatLng, type LatLng } from "@/components/maps/maps-provider";
@@ -22,14 +28,37 @@ export type CafeFormValues = {
   district: District | "";
   location: LatLng | null;
   phone: string;
-  pricePerHour: string;
-  pcCount: string;
   gear: string;
-  displaySpecs: string;
+  hall: TierFormValues;
+  hasVip: boolean;
+  vip: TierFormValues;
   existingImages: string[];
   pendingImages: PendingImage[];
-  openingHours: OpeningHours[];
 };
+
+export type TierFormValues = {
+  price: string;
+  pcs: string;
+  gpu: string;
+  cpu: string;
+  ram: string;
+  monitor: string;
+};
+
+function emptyTier(price: string, pcs: string): TierFormValues {
+  return { price, pcs, gpu: "", cpu: "", ram: "", monitor: "" };
+}
+
+function tierToForm(tier: PricingTier): TierFormValues {
+  return {
+    price: String(tier.price),
+    pcs: String(tier.pcs ?? 0),
+    gpu: tier.gpu,
+    cpu: tier.cpu,
+    ram: tier.ram,
+    monitor: tier.monitor,
+  };
+}
 
 export type PendingImage = {
   id: string;
@@ -45,13 +74,12 @@ export function emptyCafeForm(): CafeFormValues {
     district: "",
     location: null,
     phone: "",
-    pricePerHour: "3000",
-    pcCount: "10",
     gear: "",
-    displaySpecs: "",
+    hall: emptyTier("3000", "20"),
+    hasVip: false,
+    vip: emptyTier("5000", "10"),
     existingImages: [],
     pendingImages: [],
-    openingHours: defaultOpeningHours(),
   };
 }
 
@@ -63,16 +91,14 @@ export function cafeToFormValues(cafe: Cafe): CafeFormValues {
     district: cafe.district ?? "",
     location: cafeLatLng(cafe.location),
     phone: cafe.phone,
-    pricePerHour: String(cafe.pricePerHour),
-    pcCount: String(cafe.pcCount ?? 0),
     gear: cafe.gear ?? "",
-    displaySpecs: cafe.displaySpecs ?? "",
+    hall: cafe.pricing?.hall
+      ? tierToForm(cafe.pricing.hall)
+      : emptyTier(String(cafe.pricePerHour), String(cafe.pcCount ?? 0)),
+    hasVip: Boolean(cafe.pricing?.vip),
+    vip: cafe.pricing?.vip ? tierToForm(cafe.pricing.vip) : emptyTier("", "10"),
     existingImages: cafe.images ?? [],
     pendingImages: [],
-    openingHours:
-      cafe.openingHours?.length === 7
-        ? cafe.openingHours.map((h) => ({ ...h }))
-        : defaultOpeningHours(),
   };
 }
 
@@ -89,18 +115,19 @@ export async function buildCafePayload(form: CafeFormValues, t: Translate) {
   const name = form.name.trim();
   const address = form.address.trim();
   const phone = form.phone.trim();
-  const pricePerHour = Number(form.pricePerHour);
-  const pcCount = Number(form.pcCount);
 
   if (!name) throw new ApiError(t("form.errName"), 400);
   if (!address) throw new ApiError(t("form.errAddress"), 400);
   if (!phone) throw new ApiError(t("form.errPhone"), 400);
-  if (!Number.isFinite(pricePerHour) || pricePerHour < 0) {
-    throw new ApiError(t("form.errPrice"), 400);
-  }
-  if (!Number.isFinite(pcCount) || pcCount < 0 || !Number.isInteger(pcCount)) {
+  if (!form.location) throw new ApiError(t("form.errLocation"), 400);
+  const hall = parseTier(form.hall);
+  if (!hall) throw new ApiError(t("form.errPrice"), 400);
+  const vip = form.hasVip ? parseTier(form.vip) : null;
+  if (form.hasVip && !vip) throw new ApiError(t("form.errVipPrice"), 400);
+  if (Number.isNaN(hall.pcs) || (vip && Number.isNaN(vip.pcs))) {
     throw new ApiError(t("form.errPcCount"), 400);
   }
+  const pcCount = hall.pcs + (vip?.pcs ?? 0);
 
   // One image per request keeps each body under Vercel's 4.5 MB limit.
   const uploadedUrls: string[] = [];
@@ -116,15 +143,126 @@ export async function buildCafePayload(form: CafeFormValues, t: Translate) {
     description: form.description.trim() || undefined,
     address,
     district: form.district || undefined,
-    location: form.location ?? undefined,
+    location: form.location,
     phone,
-    pricePerHour,
     pcCount,
     gear: form.gear.trim() || undefined,
-    displaySpecs: form.displaySpecs.trim() || undefined,
+    pricing: { hall, vip },
     images: [...form.existingImages, ...uploadedUrls],
-    openingHours: form.openingHours,
   };
+}
+
+/** Returns NaN for pcs when it is not a whole number ≥ 0, so the caller can report it. */
+function parseTier(tier: TierFormValues): PricingTier | null {
+  if (!tier.price.trim()) return null;
+  const price = Number(tier.price);
+  if (!Number.isFinite(price) || price < 0) return null;
+  return {
+    price,
+    pcs: parsePcs(tier.pcs),
+    gpu: tier.gpu.trim(),
+    cpu: tier.cpu.trim(),
+    ram: tier.ram.trim(),
+    monitor: tier.monitor.trim(),
+  };
+}
+
+function parsePcs(value: string): number {
+  const pcs = Number(value.trim() || "0");
+  return Number.isInteger(pcs) && pcs >= 0 ? pcs : Number.NaN;
+}
+
+type TierFieldsProps = {
+  variant: TierVariant;
+  value: TierFormValues;
+  onChange: (next: TierFormValues) => void;
+  onRemove?: () => void;
+  disabled?: boolean;
+  inputClass: string;
+};
+
+function TierFields({
+  variant,
+  value,
+  onChange,
+  onRemove,
+  disabled,
+  inputClass,
+}: TierFieldsProps) {
+  const { t } = useLocale();
+  const styles = TIER_STYLES[variant];
+
+  return (
+    <div className={cn("space-y-3 rounded-2xl border p-4 transition", styles.card)}>
+      <div className="flex items-center justify-between gap-3">
+        <span
+          className={cn(
+            "inline-flex items-center gap-2 font-display text-lg font-semibold",
+            styles.title,
+          )}
+        >
+          {variant === "vip" ? <Crown className="h-4 w-4" /> : null}
+          {t(variant === "vip" ? "form.vip" : "form.hall")}
+        </span>
+        {onRemove ? (
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={onRemove}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-ink-500 transition hover:bg-ink-800 hover:text-ink-100"
+            aria-label={t("form.removeVip")}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="block space-y-1.5">
+          <span className="text-xs text-ink-500">{t("form.pricePerHour")}</span>
+          <input
+            required
+            disabled={disabled}
+            inputMode="numeric"
+            value={value.price}
+            onChange={(e) => onChange({ ...value, price: e.target.value })}
+            className={cn(inputClass, "font-display text-lg font-semibold")}
+          />
+        </label>
+        <label className="block space-y-1.5">
+          <span className="inline-flex items-center gap-1.5 text-xs text-ink-500">
+            <Monitor className="h-3.5 w-3.5 text-ink-400" />
+            {t("form.tierPcs")}
+          </span>
+          <input
+            disabled={disabled}
+            inputMode="numeric"
+            value={value.pcs}
+            onChange={(e) => onChange({ ...value, pcs: e.target.value })}
+            className={cn(inputClass, "font-display text-lg font-semibold")}
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        {TIER_SPECS.map(({ key, icon: Icon, iconClass }) => (
+          <label key={key} className="block space-y-1">
+            <span className="inline-flex items-center gap-1.5 text-xs text-ink-500">
+              <Icon className={cn("h-3.5 w-3.5", iconClass)} />
+              {t(`form.${key}`)}
+            </span>
+            <input
+              disabled={disabled}
+              value={value[key]}
+              onChange={(e) => onChange({ ...value, [key]: e.target.value })}
+              placeholder={t(`form.${key}Placeholder`)}
+              className={inputClass}
+            />
+          </label>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 type CafeFormProps = {
@@ -134,7 +272,7 @@ type CafeFormProps = {
 };
 
 export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
-  const { t, days, locale } = useLocale();
+  const { t, locale } = useLocale();
 
   const previewItems = useMemo(
     () => [
@@ -182,12 +320,8 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
     );
   }
 
-  function updateHour(day: number, patch: Partial<OpeningHours>) {
-    set(
-      "openingHours",
-      value.openingHours.map((h) => (h.day === day ? { ...h, ...patch } : h)),
-    );
-  }
+  const totalPcs =
+    (parsePcs(value.hall.pcs) || 0) + (value.hasVip ? parsePcs(value.vip.pcs) || 0 : 0);
 
   const inputClass =
     "w-full rounded-xl border border-ink-700 bg-ink-950/80 px-3 py-2.5 text-ink-100 disabled:opacity-60";
@@ -202,34 +336,6 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
             disabled={disabled}
             value={value.name}
             onChange={(e) => set("name", e.target.value)}
-            className={inputClass}
-          />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">
-            {t("form.pricePerHour")}
-          </span>
-          <input
-            required
-            disabled={disabled}
-            inputMode="numeric"
-            value={value.pricePerHour}
-            onChange={(e) => set("pricePerHour", e.target.value)}
-            className={inputClass}
-          />
-        </label>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">{t("form.pcCount")}</span>
-          <input
-            required
-            disabled={disabled}
-            inputMode="numeric"
-            min={0}
-            value={value.pcCount}
-            onChange={(e) => set("pcCount", e.target.value)}
             className={inputClass}
           />
         </label>
@@ -312,54 +418,48 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
         />
       </label>
 
-      <label className="block space-y-1.5">
-        <span className="text-sm font-medium text-ink-100">{t("form.specs")}</span>
-        <textarea
-          disabled={disabled}
-          rows={3}
-          value={value.displaySpecs}
-          onChange={(e) => set("displaySpecs", e.target.value)}
-          placeholder={t("form.specsPlaceholder")}
-          className={inputClass}
-        />
-      </label>
-
-      <div className="space-y-3">
-        <span className="text-sm font-medium text-ink-100">{t("form.openingHours")}</span>
-        <div className="space-y-2 rounded-xl border border-ink-800 p-3">
-          {value.openingHours.map((h) => (
-            <div
-              key={h.day}
-              className="grid grid-cols-[3rem_1fr_1fr_auto] items-center gap-2 text-sm"
-            >
-              <span className="text-ink-400">{days[h.day]}</span>
-              <input
-                type="time"
-                disabled={disabled || h.closed}
-                value={h.open}
-                onChange={(e) => updateHour(h.day, { open: e.target.value })}
-                className={inputClass}
-              />
-              <input
-                type="time"
-                disabled={disabled || h.closed}
-                value={h.close}
-                onChange={(e) => updateHour(h.day, { close: e.target.value })}
-                className={inputClass}
-              />
-              <label className="flex items-center gap-1.5 text-ink-400 whitespace-nowrap">
-                <input
-                  type="checkbox"
-                  disabled={disabled}
-                  checked={Boolean(h.closed)}
-                  onChange={(e) => updateHour(h.day, { closed: e.target.checked })}
-                />
-                {t("cafe.closed")}
-              </label>
-            </div>
-          ))}
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-0.5">
+            <span className="text-sm font-medium text-ink-100">{t("form.pricing")}</span>
+            <p className="text-xs text-ink-500">{t("form.pricingHint")}</p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-700 bg-ink-900/60 px-3 py-1 text-sm font-medium text-ink-100">
+            <Monitor className="h-3.5 w-3.5 text-accent" />
+            {t("form.totalPcs", { n: totalPcs })}
+          </span>
         </div>
-      </div>
+
+        <div className="grid gap-4">
+          <TierFields
+            variant="hall"
+            value={value.hall}
+            onChange={(hall) => set("hall", hall)}
+            disabled={disabled}
+            inputClass={inputClass}
+          />
+          {value.hasVip ? (
+            <TierFields
+              variant="vip"
+              value={value.vip}
+              onChange={(vip) => set("vip", vip)}
+              onRemove={() => set("hasVip", false)}
+              disabled={disabled}
+              inputClass={inputClass}
+            />
+          ) : (
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => set("hasVip", true)}
+              className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-ink-700 py-5 text-sm text-ink-500 transition hover:border-status-inuse/60 hover:text-status-inuse disabled:opacity-60"
+            >
+              <Crown className="h-4 w-4" />
+              + {t("form.hasVip")}
+            </button>
+          )}
+        </div>
+      </section>
 
       <div className="space-y-3">
         <span className="text-sm font-medium text-ink-100">{t("form.images")}</span>

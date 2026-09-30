@@ -78,13 +78,44 @@ export const LoginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof LoginSchema>;
 
+export const PricingTierSchema = z.object({
+  price: z.number().min(0),
+  pcs: z.number().int().min(0).default(0),
+  gpu: z.string().max(100).default(""),
+  cpu: z.string().max(100).default(""),
+  ram: z.string().max(100).default(""),
+  monitor: z.string().max(100).default(""),
+});
+export type PricingTier = z.infer<typeof PricingTierSchema>;
+
+export const CafePricingSchema = z.object({
+  hall: PricingTierSchema,
+  vip: PricingTierSchema.nullable().optional(),
+});
+export type CafePricing = z.infer<typeof CafePricingSchema>;
+
+/** Joins tier specs into one searchable line, e.g. "RTX 5070Ti · Ryzen 7 9800X3D · 32GB DDR5 · ZOWIE 600Hz". */
+export function pricingSummary(pricing: CafePricing): string {
+  const tiers = [pricing.hall, pricing.vip].filter(
+    (tier): tier is PricingTier => Boolean(tier),
+  );
+  const lines = tiers.map((tier) =>
+    [tier.gpu, tier.cpu, tier.ram, tier.monitor]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(" · "),
+  );
+  return [...new Set(lines.filter(Boolean))].join(" / ");
+}
+
 export const CreateCafeSchema = z.object({
   name: z.string().min(1).max(120),
   description: z.string().max(2000).optional(),
   address: z.string().min(1).max(300),
   district: DistrictSchema.optional(),
   phone: z.string().min(5).max(30),
-  pricePerHour: z.number().min(0),
+  pricePerHour: z.number().min(0).optional(),
+  pricing: CafePricingSchema.optional(),
   gear: z.string().max(2000).optional(),
   displaySpecs: z.string().max(2000).optional(),
   pcCount: z.number().int().min(0).optional(),
