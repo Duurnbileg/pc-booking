@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { API_PATHS } from "@pc-booking/shared";
+import { API_PATHS, type OpeningHours } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { districtLabel, formatMnt } from "@/lib/utils";
+import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
 import { CafeDetailSkeleton } from "@/components/skeletons";
@@ -20,7 +20,7 @@ import {
 export default function CafeDetailPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
-  const { t, days, locale } = useLocale();
+  const { t, locale } = useLocale();
 
   const cafeQuery = useQuery({
     queryKey: ["cafe", slug],
@@ -52,6 +52,9 @@ export default function CafeDetailPage() {
           {t("cafe.backDiscover")}
         </Link>
         <h1 className="font-display text-4xl tracking-tight">{cafe.name}</h1>
+        {cafe.openingHours?.length ? (
+          <OpeningHoursBadges openingHours={cafe.openingHours} />
+        ) : null}
         {cafe.description ? (
           <p className="max-w-2xl text-ink-300">{cafe.description}</p>
         ) : null}
@@ -130,19 +133,89 @@ export default function CafeDetailPage() {
         </section>
       ) : null}
 
-      {cafe.openingHours?.length ? (
-        <section className="space-y-2">
-          <h2 className="font-display text-xl">{t("cafe.hours")}</h2>
-          <ul className="text-sm text-ink-400 grid sm:grid-cols-2 gap-1">
-            {cafe.openingHours.map((h) => (
-              <li key={h.day}>
-                {days[h.day] ?? h.day}:{" "}
-                {h.closed ? t("cafe.closed") : `${h.open} – ${h.close}`}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </div>
+  );
+}
+
+const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
+
+type HoursGroup = { days: number[]; hours: OpeningHours };
+
+function sameHours(a: OpeningHours, b: OpeningHours): boolean {
+  if (a.closed || b.closed) return Boolean(a.closed) === Boolean(b.closed);
+  return a.open === b.open && a.close === b.close;
+}
+
+function groupHours(openingHours: OpeningHours[]): HoursGroup[] {
+  const byDay = new Map(openingHours.map((h) => [h.day, h]));
+  const groups: HoursGroup[] = [];
+  for (const day of WEEK_ORDER) {
+    const hours = byDay.get(day);
+    if (!hours) continue;
+    const last = groups[groups.length - 1];
+    const prevDay = last?.days[last.days.length - 1];
+    const consecutive =
+      prevDay !== undefined && WEEK_ORDER.indexOf(prevDay) === WEEK_ORDER.indexOf(day) - 1;
+    if (last && consecutive && sameHours(last.hours, hours)) {
+      last.days.push(day);
+    } else {
+      groups.push({ days: [day], hours });
+    }
+  }
+  return groups;
+}
+
+function OpeningHoursBadges({ openingHours }: { openingHours: OpeningHours[] }) {
+  const { t, days } = useLocale();
+  const groups = groupHours(openingHours);
+  if (!groups.length) return null;
+
+  const everyDay = groups.length === 1 && groups[0].days.length === 7;
+  const dayLabel = (group: HoursGroup) => {
+    if (everyDay) return t("cafe.everyDay");
+    const first = days[group.days[0]];
+    const last = days[group.days[group.days.length - 1]];
+    return group.days.length > 1 ? `${first}–${last}` : first;
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2" aria-label={t("cafe.hours")}>
+      {groups.map((group) => (
+        <span
+          key={group.days.join("-")}
+          title={t("cafe.hours")}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs",
+            group.hours.closed
+              ? "border-status-reserved/40 bg-status-reserved/10 text-status-reserved"
+              : "border-ink-700 bg-ink-900/60 text-ink-300",
+          )}
+        >
+          <ClockIcon />
+          <span className="font-medium text-ink-100">{dayLabel(group)}</span>
+          {group.hours.closed
+            ? t("cafe.closed")
+            : `${group.hours.open}–${group.hours.close}`}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      className="h-3 w-3"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
   );
 }

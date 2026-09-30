@@ -37,10 +37,11 @@ const cafeSchema = new Schema(
     openingHours: { type: [openingHoursSchema], default: [] },
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED", "SUSPENDED"] satisfies CafeStatus[],
+      enum: ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"] satisfies CafeStatus[],
       default: "PENDING",
       index: true,
     },
+    rejectionReason: { type: String, default: "" },
     ownerId: {
       type: Schema.Types.ObjectId,
       ref: "User",

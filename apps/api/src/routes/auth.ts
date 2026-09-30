@@ -64,6 +64,9 @@ authRouter.post("/login", async (req, res) => {
     return;
   }
 
+  user.lastLoginAt = new Date();
+  await user.save();
+
   const token = signToken(user);
   setAuthCookie(res, token);
   res.json({ user: toPublicUser(user) });

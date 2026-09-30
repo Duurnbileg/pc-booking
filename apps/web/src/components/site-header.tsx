@@ -27,14 +27,9 @@ export function SiteHeader() {
             </Link>
           ) : null}
           {user?.role === "ADMIN" ? (
-            <>
-              <Link href="/admin" className="hover:text-ink-100 transition">
-                {t("nav.admin")}
-              </Link>
-              <Link href="/admin/cafes" className="hover:text-ink-100 transition">
-                {t("nav.pending")}
-              </Link>
-            </>
+            <Link href="/admin" className="hover:text-ink-100 transition">
+              {t("nav.admin")}
+            </Link>
           ) : null}
 
           <div className="ml-1 flex items-center border-l border-ink-800 pl-3">
