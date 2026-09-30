@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/auth-provider";
 import { useT } from "@/components/locale-provider";
 import { LocaleMenu } from "@/components/locale-menu";
+import { BrandLogo } from "@/components/brand-logo";
 
 export function SiteHeader() {
   const { user, loading, logout } = useAuth();
@@ -12,8 +13,8 @@ export function SiteHeader() {
   return (
     <header className="border-b border-ink-800/80 bg-ink-950/80 backdrop-blur-md sticky top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
-        <Link href="/" className="font-display text-xl tracking-tight text-ink-100">
-          PC<span className="text-accent">Book</span>
+        <Link href="/" aria-label="PickPC">
+          <BrandLogo />
         </Link>
         <nav className="flex items-center gap-3 text-sm text-ink-300">
           {user?.role === "CAFE_OWNER" || user?.role === "ADMIN" ? (

@@ -1,4 +1,4 @@
-# PCBook — Gaming Center Booking (Phase 1)
+# PickPC — Gaming Center Booking (Phase 1)
 
 Unified customer-facing discovery layer for Mongolian gaming centers.
 
