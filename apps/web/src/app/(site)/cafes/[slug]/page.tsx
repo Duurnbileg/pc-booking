@@ -3,14 +3,23 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { API_PATHS, type OpeningHours } from "@pc-booking/shared";
+import type { ReactNode } from "react";
+import {
+  ArrowUpRight,
+  Headphones,
+  MapPin,
+  Phone,
+  type LucideIcon,
+} from "lucide-react";
+import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { cn, districtLabel, formatMnt } from "@/lib/utils";
+import { districtLabel } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
+import { CafePricingCards } from "@/components/cafe-pricing-cards";
+import { CafeGallery } from "@/components/cafe-gallery";
 import { CafeDetailSkeleton } from "@/components/skeletons";
-import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { cafeLatLng } from "@/components/maps/maps-provider";
 import {
   CafeLocationMap,
@@ -44,6 +53,11 @@ export default function CafeDetailPage() {
 
   const cafe = cafeQuery.data.cafe;
   const position = cafeLatLng(cafe.location);
+  const address = cafe.address.replace(/^\s*хаяг\s*:\s*/i, "").trim();
+  const gearItems = (cafe.gear ?? "")
+    .split(/[,·•\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 
   return (
     <div className="space-y-10">
@@ -52,55 +66,74 @@ export default function CafeDetailPage() {
           {t("cafe.backDiscover")}
         </Link>
         <h1 className="font-display text-4xl tracking-tight">{cafe.name}</h1>
-        {cafe.openingHours?.length ? (
-          <OpeningHoursBadges openingHours={cafe.openingHours} />
+        {cafe.district ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
+            <MapPin className="h-3 w-3" />
+            {districtLabel(cafe.district, locale)}
+          </span>
         ) : null}
         {cafe.description ? (
-          <p className="max-w-2xl text-ink-300">{cafe.description}</p>
+          <p className="max-w-3xl whitespace-pre-line text-base leading-relaxed text-ink-100 sm:text-lg">
+            {cafe.description}
+          </p>
         ) : null}
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-400">
-          {cafe.district ? (
-            <span className="text-accent">{districtLabel(cafe.district, locale)}</span>
-          ) : null}
-          <span>{cafe.address}</span>
-          <a href={`tel:${cafe.phone}`} className="hover:text-accent">
-            {cafe.phone}
-          </a>
-          <span>{t("home.pcs", { n: cafe.pcCount ?? 0 })}</span>
-          <span className="text-accent font-medium">
-            {formatMnt(cafe.pricePerHour)} {t("home.perHour")}
-          </span>
-        </div>
-        {cafe.gear || cafe.displaySpecs ? (
-          <div className="max-w-2xl space-y-1 text-sm text-ink-300">
-            {cafe.gear ? (
-              <p>
-                <span className="text-ink-500">{t("cafe.gear")} </span>
-                {cafe.gear}
-              </p>
+        {address || gearItems.length ? (
+          <div className="grid max-w-3xl gap-3 pt-1 sm:grid-cols-2">
+            {address ? (
+              <InfoCard
+                icon={MapPin}
+                label={t("cafe.address")}
+                href={position ? directionsUrl(position) : undefined}
+              >
+                <p className="text-sm font-medium leading-snug text-ink-100">{address}</p>
+              </InfoCard>
             ) : null}
-            {cafe.displaySpecs ? (
-              <p>
-                <span className="text-ink-500">{t("cafe.specs")} </span>
-                {cafe.displaySpecs}
-              </p>
+            {gearItems.length ? (
+              <InfoCard icon={Headphones} label={t("cafe.gearLabel")}>
+                <ul className="flex flex-wrap gap-1.5">
+                  {gearItems.map((item) => (
+                    <li
+                      key={item}
+                      className="rounded-full border border-ink-700 bg-ink-950/60 px-2.5 py-1 text-xs text-ink-100"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </InfoCard>
             ) : null}
+          </div>
+        ) : null}
+        {cafe.phone ? (
+          <div className="pt-2">
+            <a
+              href={`tel:${cafe.phone.replace(/\s+/g, "")}`}
+              className="group inline-flex items-center gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 py-3 pl-3 pr-6 transition duration-300 hover:-translate-y-0.5 hover:border-accent/40"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent transition duration-300 group-hover:bg-accent/20">
+                <Phone className="h-5 w-5" />
+              </span>
+              <span className="flex flex-col gap-0.5 leading-tight">
+                <span className="text-xs uppercase tracking-wider text-ink-500">
+                  {t("cafe.call")}
+                </span>
+                <span className="font-display text-xl font-semibold tracking-wide text-ink-100">
+                  {cafe.phone}
+                </span>
+              </span>
+            </a>
           </div>
         ) : null}
         {cafe.images?.length ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 pt-2">
-            {cafe.images.map((url) => (
-              <div
-                key={url}
-                className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-ink-800 bg-ink-900"
-              >
-                <ImageWithSkeleton src={url} alt="" />
-              </div>
-            ))}
+          <div className="pt-4">
+            <CafeGallery images={cafe.images} />
           </div>
         ) : null}
         <div className="pt-2">
-          <PcSeatMap slug={cafe.slug} />
+          <CafePricingCards cafe={cafe} />
+        </div>
+        <div className="pt-2">
+          <PcSeatMap cafe={cafe} />
         </div>
         <button
           type="button"
@@ -113,18 +146,19 @@ export default function CafeDetailPage() {
 
       {position ? (
         <section className="space-y-3">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <h2 className="font-display text-xl">{t("map.location")}</h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="max-w-3xl text-base leading-relaxed text-ink-100 sm:text-lg">
+              {address}
+            </p>
             <a
               href={directionsUrl(position)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-accent hover:underline"
+              className="shrink-0 text-sm text-accent hover:underline"
             >
               {t("map.directions")}
             </a>
           </div>
-          <p className="text-sm text-ink-400">{cafe.address}</p>
           <CafeLocationMap
             position={position}
             title={cafe.name}
@@ -132,90 +166,43 @@ export default function CafeDetailPage() {
           />
         </section>
       ) : null}
-
     </div>
   );
 }
 
-const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
-
-type HoursGroup = { days: number[]; hours: OpeningHours };
-
-function sameHours(a: OpeningHours, b: OpeningHours): boolean {
-  if (a.closed || b.closed) return Boolean(a.closed) === Boolean(b.closed);
-  return a.open === b.open && a.close === b.close;
-}
-
-function groupHours(openingHours: OpeningHours[]): HoursGroup[] {
-  const byDay = new Map(openingHours.map((h) => [h.day, h]));
-  const groups: HoursGroup[] = [];
-  for (const day of WEEK_ORDER) {
-    const hours = byDay.get(day);
-    if (!hours) continue;
-    const last = groups[groups.length - 1];
-    const prevDay = last?.days[last.days.length - 1];
-    const consecutive =
-      prevDay !== undefined && WEEK_ORDER.indexOf(prevDay) === WEEK_ORDER.indexOf(day) - 1;
-    if (last && consecutive && sameHours(last.hours, hours)) {
-      last.days.push(day);
-    } else {
-      groups.push({ days: [day], hours });
-    }
-  }
-  return groups;
-}
-
-function OpeningHoursBadges({ openingHours }: { openingHours: OpeningHours[] }) {
-  const { t, days } = useLocale();
-  const groups = groupHours(openingHours);
-  if (!groups.length) return null;
-
-  const everyDay = groups.length === 1 && groups[0].days.length === 7;
-  const dayLabel = (group: HoursGroup) => {
-    if (everyDay) return t("cafe.everyDay");
-    const first = days[group.days[0]];
-    const last = days[group.days[group.days.length - 1]];
-    return group.days.length > 1 ? `${first}–${last}` : first;
-  };
-
-  return (
-    <div className="flex flex-wrap gap-2" aria-label={t("cafe.hours")}>
-      {groups.map((group) => (
-        <span
-          key={group.days.join("-")}
-          title={t("cafe.hours")}
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs",
-            group.hours.closed
-              ? "border-status-reserved/40 bg-status-reserved/10 text-status-reserved"
-              : "border-ink-700 bg-ink-900/60 text-ink-300",
-          )}
-        >
-          <ClockIcon />
-          <span className="font-medium text-ink-100">{dayLabel(group)}</span>
-          {group.hours.closed
-            ? t("cafe.closed")
-            : `${group.hours.open}–${group.hours.close}`}
-        </span>
-      ))}
-    </div>
+function InfoCard({
+  icon: Icon,
+  label,
+  href,
+  children,
+}: {
+  icon: LucideIcon;
+  label: string;
+  href?: string;
+  children: ReactNode;
+}) {
+  const body = (
+    <>
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent transition group-hover:bg-accent group-hover:text-ink-950">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div className="min-w-0 flex-1 space-y-1.5">
+        <span className="block text-xs uppercase tracking-wider text-ink-500">{label}</span>
+        {children}
+      </div>
+      {href ? (
+        <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+      ) : null}
+    </>
   );
-}
+  const className =
+    "group flex items-start gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_12px_40px_rgba(61,220,151,0.1)]";
 
-function ClockIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      className="h-3 w-3"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
-    </svg>
+  return href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      {body}
+    </a>
+  ) : (
+    <div className={className}>{body}</div>
   );
 }

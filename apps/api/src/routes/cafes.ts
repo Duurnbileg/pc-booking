@@ -4,10 +4,12 @@ import {
   CreateCafeSchema,
   DistrictSchema,
   UpdateCafeSchema,
+  pricingSummary,
   slugify,
+  type CafePricing,
   type CafeSort,
 } from "@pc-booking/shared";
-import { Cafe } from "../models/Cafe.js";
+import { Cafe, type CafeDocument } from "../models/Cafe.js";
 import { PC } from "../models/PC.js";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
 import { serializeCafe, serializePc } from "../utils/serialize.js";
@@ -31,6 +33,15 @@ function escapeRegex(value: string): string {
 function specPattern(tag: string): string {
   const number = tag.match(/\d+/)?.[0];
   return number ? `(?<!\\d)${number}(?!\\d)` : escapeRegex(tag);
+}
+
+/** pricePerHour and displaySpecs stay derived from pricing so search, sort, and cards keep working. */
+function applyPricing(cafe: CafeDocument, pricing: CafePricing) {
+  cafe.pricing = { hall: pricing.hall, vip: pricing.vip ?? null } as never;
+  cafe.pricePerHour = pricing.hall.price;
+  cafe.displaySpecs = pricingSummary(pricing);
+  const pcs = pricing.hall.pcs + (pricing.vip?.pcs ?? 0);
+  if (pcs > 0) cafe.totalPcs = pcs;
 }
 
 function queryString(value: unknown): string {
@@ -264,8 +275,14 @@ cafesRouter.post(
     }
 
     const data = parsed.data;
+    const pricePerHour = data.pricing?.hall.price ?? data.pricePerHour;
+    if (pricePerHour === undefined) {
+      res.status(400).json({ error: "pricing is required" });
+      return;
+    }
+
     const slug = await uniqueSlug(data.name);
-    const cafe = await Cafe.create({
+    const cafe = new Cafe({
       name: data.name,
       slug,
       description: data.description ?? "",
@@ -279,7 +296,7 @@ cafesRouter.post(
       openingHours: data.openingHours ?? defaultOpeningHours(),
       status: req.user!.role === "ADMIN" ? "APPROVED" : "PENDING",
       ownerId: req.user!.id,
-      pricePerHour: data.pricePerHour,
+      pricePerHour,
       location: {
         type: "Point",
         coordinates: [
@@ -288,6 +305,8 @@ cafesRouter.post(
         ],
       },
     });
+    if (data.pricing) applyPricing(cafe, data.pricing);
+    await cafe.save();
 
     if (data.pcs?.length) {
       await PC.insertMany(
@@ -297,7 +316,7 @@ cafesRouter.post(
           zone: pc.zone,
           status: pc.status ?? "AVAILABLE",
           specifications: pc.specifications,
-          pricePerHour: pc.pricePerHour ?? data.pricePerHour,
+          pricePerHour: pc.pricePerHour ?? pricePerHour,
         })),
       );
     }
@@ -344,6 +363,7 @@ cafesRouter.patch(
     if (data.gear !== undefined) cafe.gear = data.gear;
     if (data.displaySpecs !== undefined) cafe.displaySpecs = data.displaySpecs;
     if (data.pcCount !== undefined) cafe.totalPcs = data.pcCount;
+    if (data.pricing) applyPricing(cafe, data.pricing);
     if (data.openingHours !== undefined) {
       cafe.openingHours = data.openingHours as never;
     }

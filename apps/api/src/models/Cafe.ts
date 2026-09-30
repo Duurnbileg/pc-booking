@@ -11,6 +11,18 @@ const openingHoursSchema = new Schema(
   { _id: false },
 );
 
+const pricingTierSchema = new Schema(
+  {
+    price: { type: Number, required: true, min: 0 },
+    pcs: { type: Number, min: 0, default: 0 },
+    gpu: { type: String, default: "" },
+    cpu: { type: String, default: "" },
+    ram: { type: String, default: "" },
+    monitor: { type: String, default: "" },
+  },
+  { _id: false },
+);
+
 const cafeSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -49,6 +61,10 @@ const cafeSchema = new Schema(
       index: true,
     },
     pricePerHour: { type: Number, required: true, min: 0 },
+    pricing: {
+      hall: { type: pricingTierSchema, default: null },
+      vip: { type: pricingTierSchema, default: null },
+    },
   },
   { timestamps: true, collection: "cafes" },
 );

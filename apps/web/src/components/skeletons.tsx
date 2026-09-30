@@ -84,16 +84,19 @@ export function ResultListSkeleton({ count = 3 }: { count?: number }) {
 /** Inner content of the seat map section (summary boxes + seat tiles). */
 export function SeatMapSkeleton() {
   return (
-    <LoadingRegion className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {repeat(4).map((i) => (
-          <Skeleton key={i} className="h-[68px] rounded-xl" />
-        ))}
+    <LoadingRegion className="space-y-5">
+      <div className="space-y-3">
+        <Skeleton className="h-2 w-full rounded-full" />
+        <div className="flex flex-wrap gap-5">
+          {repeat(2).map((i) => (
+            <Skeleton key={i} className="h-3 w-24" />
+          ))}
+        </div>
       </div>
-      <Skeleton className="h-4 w-24" />
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-        {repeat(16).map((i) => (
-          <Skeleton key={i} className="h-[70px] rounded-lg" />
+      <Skeleton className="h-4 w-16" />
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(2.5rem,1fr))] gap-1.5">
+        {repeat(24).map((i) => (
+          <Skeleton key={i} className="h-9 rounded-lg" />
         ))}
       </div>
     </LoadingRegion>

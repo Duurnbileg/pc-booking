@@ -43,10 +43,7 @@ export default function NewCafePage() {
       const payload = await buildCafePayload(form, t);
       const data = await api<{ cafe: Cafe }>(API_PATHS.cafes.list, {
         method: "POST",
-        body: JSON.stringify({
-          ...payload,
-          location: { lng: 106.917, lat: 47.918 },
-        }),
+        body: JSON.stringify(payload),
       });
       revokePending(form.pendingImages);
       router.push(`/owner/cafes/${data.cafe.id}`);

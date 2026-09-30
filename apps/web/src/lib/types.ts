@@ -3,6 +3,7 @@ import type {
   District,
   OpeningHours,
   PcStatus,
+  PricingTier,
   UserRole,
 } from "@pc-booking/shared";
 
@@ -31,6 +32,7 @@ export type Cafe = {
   rejectionReason?: string;
   ownerId: string;
   pricePerHour: number;
+  pricing: { hall: PricingTier; vip: PricingTier | null };
   pcCount?: number;
   availablePcs?: number | null;
   distanceKm?: number;

@@ -5,7 +5,12 @@ import { User } from "./models/User.js";
 import { Cafe } from "./models/Cafe.js";
 import { PC } from "./models/PC.js";
 import { Integration } from "./models/Integration.js";
-import type { District, PcStatus } from "@pc-booking/shared";
+import {
+  pricingSummary,
+  type CafePricing,
+  type District,
+  type PcStatus,
+} from "@pc-booking/shared";
 
 const STATUSES: PcStatus[] = [
   "AVAILABLE",
@@ -95,9 +100,8 @@ async function seed() {
     address: string;
     district: District;
     phone: string;
-    pricePerHour: number;
+    pricing: CafePricing;
     gear: string;
-    displaySpecs: string;
     coordinates: [number, number];
     pcCount: number;
     prefix: string;
@@ -113,9 +117,11 @@ async function seed() {
       address: "Seoul St 15, Sukhbaatar District, Ulaanbaatar",
       district: "SUKHBAATAR",
       phone: "+97670111111",
-      pricePerHour: 3000,
+      pricing: {
+        hall: { price: 3000, pcs: 12, gpu: "RTX 3060", cpu: "Ryzen 5 5600X", ram: "16GB DDR4", monitor: "144Hz" },
+        vip: { price: 4000, pcs: 12, gpu: "RTX 4070", cpu: "Ryzen 7 5800X", ram: "32GB DDR4", monitor: "240Hz" },
+      },
       gear: "Racing chairs, HyperX headsets, Logitech mice",
-      displaySpecs: "Ryzen 5/7 · RTX 3060/4070 · 16–32GB · 144–240Hz",
       coordinates: [106.9177, 47.9184] as [number, number],
       pcCount: 24,
       prefix: "pg",
@@ -135,9 +141,11 @@ async function seed() {
       address: "Peace Avenue 45, Chingeltei District, Ulaanbaatar",
       district: "CHINGELTEI",
       phone: "+97670112222",
-      pricePerHour: 3500,
+      pricing: {
+        hall: { price: 3500, pcs: 16, gpu: "RTX 3070", cpu: "Intel i5-12400F", ram: "32GB DDR4", monitor: "27\" 165Hz" },
+        vip: { price: 4500, pcs: 16, gpu: "RTX 3070", cpu: "Intel i7-12700F", ram: "32GB DDR4", monitor: "27\" 165Hz" },
+      },
       gear: "Streaming mics, dual monitors, mechanical keyboards",
-      displaySpecs: "i5/i7 · RTX 3070 · 32GB · 27\" 165Hz",
       coordinates: [106.9055, 47.9212] as [number, number],
       pcCount: 32,
       prefix: "arena",
@@ -157,9 +165,11 @@ async function seed() {
       address: "Tokyo St 8, Bayanzurkh District, Ulaanbaatar",
       district: "BAYANZURKH",
       phone: "+97670113333",
-      pricePerHour: 2800,
+      pricing: {
+        hall: { price: 2800, pcs: 16, gpu: "RTX 3060", cpu: "Ryzen 5 5600", ram: "16GB DDR4", monitor: "144Hz" },
+        vip: null,
+      },
       gear: "Private booths, blankets, quiet headsets",
-      displaySpecs: "Ryzen 5 · RTX 3060 · 16GB · 144Hz",
       coordinates: [106.945, 47.911] as [number, number],
       pcCount: 16,
       prefix: "owl",
@@ -178,9 +188,11 @@ async function seed() {
       address: "Zaisan St 21, Khan-Uul District, Ulaanbaatar",
       district: "KHAN_UUL",
       phone: "+97670115555",
-      pricePerHour: 4500,
+      pricing: {
+        hall: { price: 4500, pcs: 20, gpu: "RTX 4080", cpu: "Intel i9-13900K", ram: "32GB DDR5", monitor: "240Hz" },
+        vip: { price: 6000, pcs: 20, gpu: "RTX 4080", cpu: "Intel i9-13900K", ram: "32GB DDR5", monitor: "ZOWIE 360Hz" },
+      },
       gear: "Secretlab chairs, Razer peripherals, stage for tournaments",
-      displaySpecs: "i9 · RTX 4080 · 32GB · 240Hz",
       coordinates: [106.9205, 47.8872] as [number, number],
       pcCount: 40,
       prefix: "zaisan",
@@ -199,9 +211,11 @@ async function seed() {
       address: "Enkhtaivan Ave 102, Bayangol District, Ulaanbaatar",
       district: "BAYANGOL",
       phone: "+97670116666",
-      pricePerHour: 2500,
+      pricing: {
+        hall: { price: 2500, pcs: 20, gpu: "GTX 1660", cpu: "Intel i5-10400F", ram: "16GB DDR4", monitor: "144Hz" },
+        vip: null,
+      },
       gear: "Standard chairs, wired headsets",
-      displaySpecs: "i5 · GTX 1660 · 16GB · 144Hz",
       coordinates: [106.8812, 47.9145] as [number, number],
       pcCount: 20,
       prefix: "west",
@@ -227,17 +241,18 @@ async function seed() {
       phone: def.phone,
       images: def.images,
       gear: def.gear,
-      displaySpecs: def.displaySpecs,
+      displaySpecs: pricingSummary(def.pricing),
       openingHours: hours(def.closedDays),
       status: "APPROVED",
       ownerId: owner!._id,
-      pricePerHour: def.pricePerHour,
+      pricePerHour: def.pricing.hall.price,
+      pricing: def.pricing,
       totalPcs: def.pcCount,
       location: { type: "Point", coordinates: def.coordinates },
     });
 
     await PC.insertMany(
-      makePcs(cafe._id.toString(), def.pcCount, def.pricePerHour, def.prefix, def.tiers),
+      makePcs(cafe._id.toString(), def.pcCount, def.pricing.hall.price, def.prefix, def.tiers),
     );
 
     await Integration.create({

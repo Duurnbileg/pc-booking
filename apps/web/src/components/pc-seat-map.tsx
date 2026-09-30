@@ -1,155 +1,182 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { Crown } from "lucide-react";
 import { API_PATHS, type PcStatus } from "@pc-booking/shared";
 import { api } from "@/lib/api";
-import type { CafePc } from "@/lib/types";
-import { cn, formatMnt } from "@/lib/utils";
+import type { Cafe, CafePc } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
-import { PC_STATUS_META, PcStatusLegend } from "@/components/pc-status";
+import { PC_STATUS_META } from "@/components/pc-status";
 import { SeatMapSkeleton } from "@/components/skeletons";
-
-type PcsResponse = {
-  pcs: CafePc[];
-  summary: {
-    total: number;
-    available: number;
-    inUse: number;
-    reserved: number;
-    offline: number;
-  };
-};
 
 const REFRESH_MS = 15_000;
 
-function groupByZone(pcs: CafePc[]): [string, CafePc[]][] {
-  const zones = new Map<string, CafePc[]>();
-  for (const pc of pcs) {
-    const zone = pc.zone ?? "—";
-    zones.set(zone, [...(zones.get(zone) ?? []), pc]);
+type Zone = "hall" | "vip";
+type SeatStatus = Extract<PcStatus, "AVAILABLE" | "IN_USE">;
+type Seat = { id: string; label: string; zone: Zone; status: SeatStatus };
+
+const SEAT_STATUSES: SeatStatus[] = ["AVAILABLE", "IN_USE"];
+const DEFAULT_MOCK_PCS = 24;
+
+function hashString(value: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    h ^= value.charCodeAt(i);
+    h = Math.imul(h, 16777619);
   }
-  return [...zones.entries()];
+  return h >>> 0;
 }
 
-export function PcSeatMap({ slug }: { slug: string }) {
+function mulberry32(seed: number) {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Seeded by slug so the demo layout stays the same across reloads. */
+function mockSeats(cafe: Cafe): Seat[] {
+  const random = mulberry32(hashString(cafe.slug));
+  let hallCount = cafe.pricing.hall.pcs ?? 0;
+  const vipCount = cafe.pricing.vip?.pcs ?? 0;
+  if (hallCount + vipCount === 0) hallCount = cafe.pcCount || DEFAULT_MOCK_PCS;
+  const labelWidth = Math.max(2, String(hallCount).length);
+  const randomStatus = (): SeatStatus => (random() < 0.45 ? "AVAILABLE" : "IN_USE");
+
+  const seats: Seat[] = [];
+  for (let i = 1; i <= hallCount; i++) {
+    seats.push({
+      id: `hall-${i}`,
+      label: String(i).padStart(labelWidth, "0"),
+      zone: "hall",
+      status: randomStatus(),
+    });
+  }
+  for (let i = 1; i <= vipCount; i++) {
+    seats.push({ id: `vip-${i}`, label: `V${i}`, zone: "vip", status: randomStatus() });
+  }
+  return seats;
+}
+
+function seatsFromPcs(pcs: CafePc[]): Seat[] {
+  return pcs.map((pc) => ({
+    id: pc.id,
+    label: pc.name.replace(/^pc[-\s]*/i, ""),
+    zone: /vip/i.test(pc.zone ?? "") ? "vip" : "hall",
+    status: pc.status === "AVAILABLE" ? "AVAILABLE" : "IN_USE",
+  }));
+}
+
+export function PcSeatMap({ cafe }: { cafe: Cafe }) {
   const { t } = useLocale();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["cafe-pcs", slug],
-    queryFn: () => api<PcsResponse>(API_PATHS.cafes.pcs(slug)),
+  const { data, isLoading } = useQuery({
+    queryKey: ["cafe-pcs", cafe.slug],
+    queryFn: () => api<{ pcs: CafePc[] }>(API_PATHS.cafes.pcs(cafe.slug)),
     refetchInterval: REFRESH_MS,
   });
 
+  const isDemo = !data?.pcs.length;
+  const seats = isDemo ? mockSeats(cafe) : seatsFromPcs(data.pcs);
+  const counts = Object.fromEntries(
+    SEAT_STATUSES.map((status) => [status, seats.filter((seat) => seat.status === status).length]),
+  ) as Record<SeatStatus, number>;
+
+  const zones = (["hall", "vip"] as const)
+    .map((zone) => ({ zone, seats: seats.filter((s) => s.zone === zone) }))
+    .filter((z) => z.seats.length);
+
   return (
-    <section className="space-y-4 rounded-2xl border border-ink-800 bg-ink-900/50 p-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+    <section className="space-y-5 rounded-2xl border border-ink-800 bg-ink-900/50 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
           <h2 className="font-display text-xl text-ink-100">{t("seat.title")}</h2>
-          <p className="text-xs text-ink-500">{t("seat.mockHint")}</p>
+          {isDemo && !isLoading ? (
+            <span className="rounded-full border border-ink-700 px-2 py-0.5 text-[10px] uppercase tracking-wider text-ink-500">
+              {t("seat.demo")}
+            </span>
+          ) : null}
         </div>
-        {data?.summary.total ? (
-          <p className="text-sm font-medium text-status-available">
-            {t("seat.availableCount", {
-              a: data.summary.available,
-              t: data.summary.total,
-            })}
-          </p>
+        {!isLoading ? (
+          <span className="inline-flex items-center gap-2 rounded-full border border-status-available/40 bg-status-available/10 px-3 py-1 text-sm font-medium text-status-available">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-available opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-status-available" />
+            </span>
+            {t("seat.availableCount", { a: counts.AVAILABLE, t: seats.length })}
+          </span>
         ) : null}
       </div>
 
       {isLoading ? (
         <SeatMapSkeleton />
-      ) : error ? (
-        <p className="text-sm text-status-reserved">{t("seat.loadError")}</p>
-      ) : !data?.pcs.length ? (
-        <p className="text-sm text-ink-500">{t("seat.notConnected")}</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <SummaryCard status="AVAILABLE" count={data.summary.available} />
-            <SummaryCard status="IN_USE" count={data.summary.inUse} />
-            <SummaryCard status="RESERVED" count={data.summary.reserved} />
-            <SummaryCard status="OFFLINE" count={data.summary.offline} />
+          <div className="space-y-3">
+            <div className="flex h-2 overflow-hidden rounded-full bg-ink-800">
+              {SEAT_STATUSES.map((status) =>
+                counts[status] ? (
+                  <div
+                    key={status}
+                    className={cn("h-full transition-all", PC_STATUS_META[status].dot)}
+                    style={{ width: `${(counts[status] / seats.length) * 100}%` }}
+                  />
+                ) : null,
+              )}
+            </div>
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-ink-300">
+              {SEAT_STATUSES.map((status) => (
+                <span key={status} className="inline-flex items-center gap-1.5">
+                  <span className={cn("h-2 w-2 rounded-full", PC_STATUS_META[status].dot)} />
+                  {t(`seat.${status}`)}
+                  <span className="font-semibold text-ink-100">{counts[status]}</span>
+                </span>
+              ))}
+            </div>
           </div>
 
-          {groupByZone(data.pcs).map(([zone, pcs]) => (
-            <div key={zone} className="space-y-2">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="text-sm font-semibold text-ink-100">{zone}</h3>
-                {pcs[0]?.pricePerHour ? (
-                  <span className="text-xs text-ink-500">
-                    {formatMnt(pcs[0].pricePerHour)}
-                    {t("home.perHour")}
-                  </span>
-                ) : null}
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-8">
-                {pcs.map((pc) => (
-                  <SeatTile key={pc.id} pc={pc} />
+          {zones.map(({ zone, seats: zoneSeats }) => (
+            <div key={zone} className="space-y-2.5">
+              <h3
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-sm font-semibold",
+                  zone === "vip" ? "text-status-inuse" : "text-accent",
+                )}
+              >
+                {zone === "vip" ? <Crown className="h-3.5 w-3.5" /> : null}
+                {t(zone === "vip" ? "seat.vip" : "seat.hall")}
+              </h3>
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(2.5rem,1fr))] gap-1.5">
+                {zoneSeats.map((seat) => (
+                  <SeatTile key={seat.id} seat={seat} />
                 ))}
               </div>
             </div>
           ))}
-
-          <PcStatusLegend />
         </>
       )}
     </section>
   );
 }
 
-function SummaryCard({ status, count }: { status: PcStatus; count: number }) {
+function SeatTile({ seat }: { seat: Seat }) {
   const { t } = useLocale();
-  const meta = PC_STATUS_META[status];
-  return (
-    <div className={cn("rounded-xl border px-3 py-2.5", meta.className)}>
-      <p className="text-2xl font-semibold">{count}</p>
-      <p className="text-xs opacity-90">{t(`seat.${status}`)}</p>
-    </div>
-  );
-}
-
-function SeatTile({ pc }: { pc: CafePc }) {
-  const { t } = useLocale();
-  const meta = PC_STATUS_META[pc.status];
-  const bookable = pc.status === "AVAILABLE";
-  const gpu = pc.specifications?.gpu;
+  const available = seat.status === "AVAILABLE";
   return (
     <div
-      title={[
-        pc.name,
-        t(`seat.${pc.status}`),
-        gpu,
-        bookable ? t("seat.bookable") : null,
-      ]
-        .filter(Boolean)
-        .join(" · ")}
+      title={`PC-${seat.label} · ${t(`seat.${seat.status}`)}`}
       className={cn(
-        "flex flex-col items-center justify-center gap-0.5 rounded-lg border px-1 py-2 text-center transition",
-        meta.className,
-        bookable ? "cursor-pointer hover:bg-status-available/20" : "opacity-80",
+        "flex h-9 items-center justify-center rounded-lg border text-[11px] font-medium transition duration-200",
+        PC_STATUS_META[seat.status].className,
+        available
+          ? "cursor-pointer hover:scale-105 hover:bg-status-available/20"
+          : "opacity-70",
       )}
     >
-      <MonitorIcon />
-      <span className="text-xs font-semibold">{pc.name}</span>
-      {gpu ? <span className="truncate text-[10px] opacity-80">{gpu}</span> : null}
+      {seat.label}
     </div>
-  );
-}
-
-function MonitorIcon() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 24 24"
-      className="h-4 w-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="4" width="18" height="12" rx="2" />
-      <path d="M8 20h8M12 16v4" />
-    </svg>
   );
 }
