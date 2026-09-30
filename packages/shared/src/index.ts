@@ -3,7 +3,7 @@ import { z } from "zod";
 export const UserRoleSchema = z.enum(["CUSTOMER", "CAFE_OWNER", "ADMIN"]);
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
-export const CafeStatusSchema = z.enum(["PENDING", "APPROVED", "SUSPENDED"]);
+export const CafeStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "SUSPENDED"]);
 export type CafeStatus = z.infer<typeof CafeStatusSchema>;
 
 export const PcStatusSchema = z.enum([
@@ -144,8 +144,13 @@ export const API_PATHS = {
     approveCafe: (id: string) => `/api/admin/cafes/${id}/approve`,
     rejectCafe: (id: string) => `/api/admin/cafes/${id}/reject`,
     suspendCafe: (id: string) => `/api/admin/cafes/${id}/suspend`,
+    deleteCafe: (id: string) => `/api/admin/cafes/${id}`,
+    cafeById: (id: string) => `/api/admin/cafes/${id}`,
     pendingCafes: "/api/admin/cafes/pending",
     cafes: "/api/admin/cafes",
+    stats: "/api/admin/stats",
+    customers: "/api/admin/customers",
+    customerById: (id: string) => `/api/admin/customers/${id}`,
   },
   upload: "/api/upload",
   owner: {
