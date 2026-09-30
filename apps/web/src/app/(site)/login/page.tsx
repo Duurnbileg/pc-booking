@@ -28,7 +28,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       setUser(data.user);
-      router.push("/");
+      router.replace(data.user.role === "ADMIN" ? "/admin" : "/");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("auth.loginFailed"));
     } finally {

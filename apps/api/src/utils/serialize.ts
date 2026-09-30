@@ -1,5 +1,28 @@
 import type { CafeDocument } from "../models/Cafe.js";
 import type { PcDocument } from "../models/PC.js";
+import type { UserDocument } from "../models/User.js";
+
+/** Only fields safe for the admin UI; never add passwordHash or tokens here. */
+export function serializeCustomer(user: UserDocument) {
+  return {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    phone: user.phone ?? null,
+    createdAt: user.createdAt,
+    lastLoginAt: user.lastLoginAt ?? null,
+  };
+}
+
+export function serializeOwner(user: UserDocument | null | undefined) {
+  if (!user) return null;
+  return {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    phone: user.phone ?? null,
+  };
+}
 
 /**
  * pcCount is the declared totalPcs on the cafe. availablePcs counts PC records with
@@ -26,6 +49,7 @@ export function serializeCafe(
     displaySpecs: cafe.displaySpecs ?? "",
     openingHours: cafe.openingHours ?? [],
     status: cafe.status,
+    rejectionReason: cafe.rejectionReason ?? "",
     ownerId: cafe.ownerId.toString(),
     pricePerHour: cafe.pricePerHour,
     pcCount: typeof cafe.totalPcs === "number" ? cafe.totalPcs : 0,

@@ -28,6 +28,7 @@ export type Cafe = {
   displaySpecs: string;
   openingHours: OpeningHours[];
   status: CafeStatus;
+  rejectionReason?: string;
   ownerId: string;
   pricePerHour: number;
   pcCount?: number;
@@ -35,6 +36,44 @@ export type Cafe = {
   distanceKm?: number;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type AdminOwner = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+};
+
+export type AdminCafe = Cafe & {
+  rejectionReason: string;
+  owner: AdminOwner | null;
+};
+
+export type AdminStats = {
+  totalPCs: number;
+  totalCustomers: number;
+  pendingPCs: number;
+  approvedPCs: number;
+  rejectedPCs: number;
+  suspendedPCs: number;
+};
+
+export type AdminCustomer = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  createdAt: string;
+  lastLoginAt: string | null;
+};
+
+export type Paginated<K extends string, T> = {
+  [key in K]: T[];
+} & {
+  total: number;
+  page: number;
+  pageSize: number;
 };
 
 export type CafePc = {

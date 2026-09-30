@@ -70,6 +70,11 @@ export default function OwnerCafesPage() {
                   {formatMnt(cafe.pricePerHour)}
                   {t("home.perHour")}
                 </p>
+                {cafe.status === "REJECTED" && cafe.rejectionReason ? (
+                  <p className="mt-1 text-sm text-status-reserved">
+                    {t("owner.rejectionReason")} {cafe.rejectionReason}
+                  </p>
+                ) : null}
               </div>
               <Link
                 href={`/owner/cafes/${cafe.id}`}

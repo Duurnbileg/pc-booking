@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
+import { useAuth } from "@/components/auth-provider";
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
 import { CafeGridSkeleton } from "@/components/skeletons";
 import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CafesMap } from "@/components/maps/cafes-map";
 import {
   getCurrentPosition,
   type LatLng,
@@ -30,12 +31,23 @@ function cafeBlurb(cafe: Cafe): string {
 }
 
 export default function HomePage() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const isAdmin = user?.role === "ADMIN";
+
+  useEffect(() => {
+    if (isAdmin) router.replace("/admin");
+  }, [isAdmin, router]);
+
+  return isAdmin ? null : <HomeContent />;
+}
+
+function HomeContent() {
   const { t, locale } = useLocale();
   const [center, setCenter] = useState<LatLng | null>(null);
   const [radiusKm, setRadiusKm] = useState(5);
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
-  const [mobileView, setMobileView] = useState<"list" | "map">("list");
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["cafes", center?.lat, center?.lng, radiusKm],
@@ -123,49 +135,10 @@ export default function HomePage() {
         </div>
         {geoError ? (
           <p className="text-sm text-status-reserved">{geoError}</p>
-        ) : (
-          <p className="text-xs text-ink-500">{t("map.clickHint")}</p>
-        )}
+        ) : null}
       </section>
 
-      <div className="flex gap-2 sm:hidden">
-        {(["list", "map"] as const).map((view) => (
-          <button
-            key={view}
-            type="button"
-            onClick={() => setMobileView(view)}
-            className={cn(
-              "flex-1 rounded-lg border px-3 py-2 text-sm",
-              mobileView === view
-                ? "border-accent text-accent"
-                : "border-ink-700 text-ink-300",
-            )}
-          >
-            {view === "list" ? t("map.showList") : t("map.showMap")}
-          </button>
-        ))}
-      </div>
-
-      <CafesMap
-        cafes={cafes}
-        center={center}
-        radiusKm={radiusKm}
-        onPickCenter={(point) => {
-          setGeoError(null);
-          setCenter(point);
-        }}
-        className={cn(
-          "h-[360px] sm:h-[420px]",
-          mobileView === "map" ? "block" : "hidden sm:block",
-        )}
-      />
-
-      <section
-        className={cn(
-          "space-y-5",
-          mobileView === "list" ? "block" : "hidden sm:block",
-        )}
-      >
+      <section className="space-y-5">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-display text-2xl text-ink-100">{subtitle}</h2>
           {isLoading ? (

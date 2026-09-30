@@ -20,6 +20,7 @@ const userSchema = new Schema(
       default: "CUSTOMER",
       required: true,
     },
+    lastLoginAt: { type: Date },
   },
   { timestamps: true },
 );
