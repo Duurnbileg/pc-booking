@@ -3,25 +3,28 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
-  ArrowUpRight,
+  Check,
+  Clock,
+  Cpu,
   Headphones,
-  MapPin,
   Navigation,
   Phone,
+  Share,
   type LucideIcon,
 } from "lucide-react";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { cn, districtLabel } from "@/lib/utils";
+import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
 import { CafePricingCards } from "@/components/cafe-pricing-cards";
-import { CafeGallery } from "@/components/cafe-gallery";
+import { CafePhotoGrid } from "@/components/cafe-photo-grid";
+import { AvailabilityBadge } from "@/components/availability-badge";
 import { CafeDetailSkeleton } from "@/components/skeletons";
-import { cafeLatLng, directionsUrl } from "@/components/maps/maps-provider";
+import { cafeLatLng, directionsUrl, type LatLng } from "@/components/maps/maps-provider";
 
 export default function CafeDetailPage() {
   const params = useParams<{ slug: string }>();
@@ -51,92 +54,289 @@ export default function CafeDetailPage() {
   const cafe = cafeQuery.data.cafe;
   const position = cafeLatLng(cafe.location);
   const address = cafe.address.replace(/^\s*хаяг\s*:\s*/i, "").trim();
-  const gearItems = (cafe.gear ?? "")
-    .split(/[,·•\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const { hall, vip } = cafe.pricing;
+  const minPrice = Math.min(hall.price, vip?.price ?? Infinity);
+  const totalPcs = cafe.pcCount ?? 0;
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
+      <div className="space-y-2">
         <Link href="/" className="text-sm text-ink-500 hover:text-ink-300">
           {t("cafe.backDiscover")}
         </Link>
-        <h1 className="font-display text-4xl tracking-tight">{cafe.name}</h1>
-        {cafe.district ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-medium text-accent">
-            <MapPin className="h-3 w-3" />
-            {districtLabel(cafe.district, locale)}
-          </span>
-        ) : null}
-        {cafe.description ? <CafeDescription text={cafe.description} /> : null}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl tracking-tight sm:text-4xl">{cafe.name}</h1>
+          <ShareButton title={cafe.name} />
+        </div>
       </div>
 
-      <div className="space-y-4">
-        {address || cafe.phone || gearItems.length ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {address ? (
-              <InfoCard
-                icon={MapPin}
-                label={t("cafe.address")}
-                href={position ? directionsUrl(position) : undefined}
-                external
-                className={cafe.phone ? undefined : "sm:col-span-2"}
-              >
-                <p
-                  title={address}
-                  className="truncate text-sm font-medium leading-snug text-ink-100"
-                >
-                  {address}
-                </p>
-                {position ? (
-                  <span className="inline-flex items-center gap-1 pt-1 text-sm font-medium text-accent">
-                    <Navigation className="h-3.5 w-3.5" />
-                    {t("cafe.openInMaps")}
-                  </span>
-                ) : null}
-              </InfoCard>
-            ) : null}
-            {cafe.phone ? (
-              <InfoCard
-                icon={Phone}
-                label={t("cafe.call")}
-                href={`tel:${cafe.phone.replace(/[^\d+]/g, "")}`}
-                className={address ? undefined : "sm:col-span-2"}
-              >
-                <p className="font-display text-xl font-semibold tracking-wide text-ink-100">
-                  {cafe.phone.replace(/^(\d{4})[\s-]?(\d{4})$/, "$1 $2")}
-                </p>
-              </InfoCard>
-            ) : null}
-            {gearItems.length ? (
-              <InfoCard icon={Headphones} label={t("cafe.gearLabel")} className="sm:col-span-2">
-                <ul className="flex flex-wrap gap-1.5">
-                  {gearItems.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-full border border-ink-700 bg-ink-950/60 px-2.5 py-1 text-xs text-ink-100"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </InfoCard>
-            ) : null}
+      <CafePhotoGrid images={cafe.images ?? []} name={cafe.name} />
+
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
+        <aside className="lg:order-last">
+          <div className="lg:sticky lg:top-24">
+            <BookingCard
+              cafe={cafe}
+              minPrice={minPrice}
+              totalPcs={totalPcs}
+              position={position}
+              address={address}
+            />
           </div>
-        ) : null}
-        {cafe.images?.length ? <CafeGallery images={cafe.images} /> : null}
-        <CafePricingCards cafe={cafe} />
-        <PcSeatMap cafe={cafe} />
+        </aside>
+
+        <div className="min-w-0 divide-y divide-ink-800 [&>*:first-child]:pt-0 [&>*]:py-8">
+          <section className="space-y-5">
+            <div className="space-y-1">
+              <h2 className="font-display text-2xl text-ink-100">
+                {cafe.district
+                  ? t("cafe.subtitle", { district: districtLabel(cafe.district, locale) })
+                  : t("cafe.subtitleNoDistrict")}
+              </h2>
+              <p className="text-ink-300">
+                {[
+                  t("home.pcs", { n: totalPcs }),
+                  t("cafe.hall"),
+                  vip ? t("cafe.vip") : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </div>
+            <HighlightStats cafe={cafe} minPrice={minPrice} totalPcs={totalPcs} />
+          </section>
+
+          <FeatureList cafe={cafe} />
+
+          {cafe.description ? (
+            <section className="space-y-3">
+              <h2 className="font-display text-xl text-ink-100">{t("cafe.about")}</h2>
+              <CafeDescription text={cafe.description} />
+            </section>
+          ) : null}
+
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-ink-100">{t("cafe.pricing")}</h2>
+            <CafePricingCards cafe={cafe} />
+          </section>
+
+          <div>
+            <PcSeatMap cafe={cafe} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShareButton({ title }: { title: string }) {
+  const { t } = useLocale();
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const id = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(id);
+  }, [copied]);
+
+  async function share() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url });
+        return;
+      } catch {
+        // Dismissed or unsupported target; fall back to copying.
+      }
+    }
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={share}
+      className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-ink-100 underline-offset-4 transition hover:bg-ink-900 hover:underline"
+    >
+      {copied ? <Check className="h-4 w-4 text-status-available" /> : <Share className="h-4 w-4" />}
+      {copied ? t("cafe.linkCopied") : t("cafe.share")}
+    </button>
+  );
+}
+
+function HighlightStats({
+  cafe,
+  minPrice,
+  totalPcs,
+}: {
+  cafe: Cafe;
+  minPrice: number;
+  totalPcs: number;
+}) {
+  const { t } = useLocale();
+  const available = cafe.availablePcs;
+  const stats: { value: string; label: string; tone?: string }[] = [
+    ...(typeof available === "number"
+      ? [
+          {
+            value: `${available}/${totalPcs}`,
+            label: t("cafe.statFree"),
+            tone: available > 0 ? "text-status-available" : "text-status-reserved",
+          },
+        ]
+      : []),
+    { value: String(totalPcs), label: t("cafe.statTotal") },
+    { value: formatMnt(minPrice), label: t("cafe.statPrice") },
+  ];
+
+  return (
+    <div
+      className="grid divide-x divide-ink-800 rounded-2xl border border-ink-800 bg-ink-900/60 py-4"
+      style={{ gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))` }}
+    >
+      {stats.map(({ value, label, tone }) => (
+        <div key={label} className="px-3 text-center">
+          <p className={cn("font-display text-xl font-semibold tabular-nums text-ink-100", tone)}>
+            {value}
+          </p>
+          <p className="mt-0.5 text-xs text-ink-500">{label}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function hoursFeature(cafe: Cafe, t: ReturnType<typeof useLocale>["t"]) {
+  const days = cafe.openingHours ?? [];
+  if (!days.length || days.some((d) => d.closed)) return null;
+  const is247 = days.every((d) => d.open === "00:00" && (d.close === "23:59" || d.close === "24:00"));
+  if (is247) return { title: t("cafe.open247"), text: t("cafe.open247Hint") };
+  const [first] = days;
+  const uniform = days.every((d) => d.open === first!.open && d.close === first!.close);
+  return uniform
+    ? { title: t("cafe.hours"), text: t("cafe.hoursDaily", { open: first!.open, close: first!.close }) }
+    : null;
+}
+
+function FeatureList({ cafe }: { cafe: Cafe }) {
+  const { t } = useLocale();
+  const best = cafe.pricing.vip ?? cafe.pricing.hall;
+  const specs = [best.gpu, best.cpu, best.ram, best.monitor]
+    .map((s) => s?.trim())
+    .filter(Boolean)
+    .join(" · ");
+  const gear = (cafe.gear ?? "")
+    .split(/[,·•\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(" · ");
+  const hours = hoursFeature(cafe, t);
+
+  const items: { icon: LucideIcon; title: string; text: string }[] = [
+    ...(hours ? [{ icon: Clock, ...hours }] : []),
+    ...(specs ? [{ icon: Cpu, title: t("cafe.topSpecs"), text: specs }] : []),
+    ...(gear ? [{ icon: Headphones, title: t("cafe.gearLabel"), text: gear }] : []),
+  ];
+
+  if (!items.length) return null;
+
+  return (
+    <ul className="space-y-5">
+      {items.map(({ icon: Icon, title, text }) => (
+        <li key={title} className="flex gap-4">
+          <Icon className="mt-0.5 h-6 w-6 shrink-0 text-ink-300" />
+          <div className="min-w-0">
+            <p className="font-medium text-ink-100">{title}</p>
+            <p className="text-sm text-ink-500">{text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function BookingCard({
+  cafe,
+  minPrice,
+  totalPcs,
+  position,
+  address,
+}: {
+  cafe: Cafe;
+  minPrice: number;
+  totalPcs: number;
+  position: LatLng | null;
+  address: string;
+}) {
+  const { t } = useLocale();
+
+  return (
+    <div className="space-y-5 rounded-2xl border border-ink-800 bg-ink-900/70 p-6 shadow-[0_16px_48px_rgba(0,0,0,0.35)]">
+      <div className="space-y-2">
+        <p className="text-ink-300">
+          <span className="font-display text-2xl font-semibold text-ink-100">
+            {t("cafe.priceFrom", { price: formatMnt(minPrice) })}
+          </span>{" "}
+          {t("home.perHour")}
+        </p>
+        <AvailabilityBadge available={cafe.availablePcs} total={totalPcs} />
+      </div>
+
+      <div className="space-y-2">
         <button
           type="button"
           disabled
-          className="cursor-not-allowed rounded-lg border border-ink-700 px-4 py-2 text-sm text-ink-500"
+          className="w-full cursor-not-allowed rounded-xl bg-accent py-3 font-medium text-ink-950 opacity-60"
         >
           {t("cafe.bookSoon")}
         </button>
+        <p className="text-center text-xs text-ink-500">{t("cafe.bookingSoonHint")}</p>
       </div>
+
+      {cafe.phone || position ? (
+        <div className="grid gap-2 border-t border-ink-800 pt-5">
+          {cafe.phone ? (
+            <ContactButton href={`tel:${cafe.phone.replace(/[^\d+]/g, "")}`} label={t("cafe.call")}>
+              <Phone className="h-4 w-4" />
+              {cafe.phone.replace(/^(\d{4})[\s-]?(\d{4})$/, "$1 $2")}
+            </ContactButton>
+          ) : null}
+          {position ? (
+            <ContactButton href={directionsUrl(position)} external title={address || undefined}>
+              <Navigation className="h-4 w-4" />
+              {t("cafe.directions")}
+            </ContactButton>
+          ) : null}
+        </div>
+      ) : null}
     </div>
+  );
+}
+
+function ContactButton({
+  href,
+  external,
+  label,
+  title,
+  children,
+}: {
+  href: string;
+  external?: boolean;
+  label?: string;
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      title={title}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="inline-flex items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-medium text-accent transition hover:bg-accent hover:text-ink-950"
+    >
+      {children}
+    </a>
   );
 }
 
@@ -152,11 +352,11 @@ function CafeDescription({ text }: { text: string }) {
   }, [text, expanded]);
 
   return (
-    <div className="max-w-3xl space-y-1">
+    <div className="space-y-1">
       <p
         ref={ref}
         className={cn(
-          "whitespace-pre-line text-base leading-relaxed text-ink-100 sm:text-lg",
+          "whitespace-pre-line leading-relaxed text-ink-100",
           !expanded && "line-clamp-5",
         )}
       >
@@ -172,53 +372,5 @@ function CafeDescription({ text }: { text: string }) {
         </button>
       ) : null}
     </div>
-  );
-}
-
-function InfoCard({
-  icon: Icon,
-  label,
-  href,
-  external,
-  className: extraClassName,
-  children,
-}: {
-  icon: LucideIcon;
-  label: string;
-  href?: string;
-  external?: boolean;
-  className?: string;
-  children: ReactNode;
-}) {
-  const body = (
-    <>
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent transition group-hover:bg-accent group-hover:text-ink-950">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <span className="block text-xs uppercase tracking-wider text-ink-500">{label}</span>
-        {children}
-      </div>
-      {href ? (
-        <ArrowUpRight className="h-4 w-4 shrink-0 text-ink-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
-      ) : null}
-    </>
-  );
-  const className = cn(
-    "group flex items-start gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 p-4 transition duration-300",
-    href && "hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_12px_40px_rgba(79,157,255,0.1)]",
-    extraClassName,
-  );
-
-  return href ? (
-    <a
-      href={href}
-      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className={className}
-    >
-      {body}
-    </a>
-  ) : (
-    <div className={className}>{body}</div>
   );
 }
