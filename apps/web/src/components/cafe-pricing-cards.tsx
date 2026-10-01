@@ -44,12 +44,11 @@ export function CafePricingCards({ cafe }: { cafe: Cafe }) {
 
   return (
     <section aria-label={t("cafe.pricing")}>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         <TierCard
           variant="hall"
           tier={hall}
           legacySpecs={hasTierSpecs ? undefined : cafe.displaySpecs}
-          className={vip ? undefined : "sm:col-span-2"}
         />
         {vip ? <TierCard variant="vip" tier={vip} /> : null}
       </div>
@@ -61,12 +60,10 @@ function TierCard({
   variant,
   tier,
   legacySpecs,
-  className,
 }: {
   variant: TierVariant;
   tier: PricingTier;
   legacySpecs?: string;
-  className?: string;
 }) {
   const { t } = useLocale();
   const styles = TIER_STYLES[variant];
@@ -77,7 +74,6 @@ function TierCard({
       className={cn(
         "relative overflow-hidden rounded-2xl border p-4 transition duration-300",
         styles.card,
-        className,
       )}
     >
       <div

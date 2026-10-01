@@ -105,32 +105,37 @@ export function SeatMapSkeleton() {
 
 export function CafeDetailSkeleton() {
   return (
-    <LoadingRegion className="space-y-3">
-      <Skeleton className="h-4 w-24" />
-      <Skeleton className="h-10 w-2/3 sm:w-1/3" />
-      <Skeleton className="h-5 w-full max-w-2xl" />
-      <div className="flex flex-wrap gap-x-6 gap-y-2 pt-1">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-56" />
-        <Skeleton className="h-4 w-28" />
-        <Skeleton className="h-4 w-16" />
+    <LoadingRegion className="space-y-6">
+      <div className="space-y-2">
         <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-2/3 sm:w-1/3" />
       </div>
-      <div className="max-w-2xl space-y-1.5">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-      <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3">
-        {repeat(3).map((i) => (
-          <Skeleton key={i} className="aspect-[4/3] w-full rounded-xl" />
+      <div className="grid h-64 gap-2 overflow-hidden rounded-2xl sm:h-[420px] sm:grid-cols-4 sm:grid-rows-2">
+        <Skeleton className="h-full w-full rounded-none sm:col-span-2 sm:row-span-2" />
+        {repeat(4).map((i) => (
+          <Skeleton key={i} className="hidden h-full w-full rounded-none sm:block" />
         ))}
       </div>
-      <div className="space-y-4 rounded-2xl border border-ink-800 bg-ink-900/50 p-5">
-        <div className="space-y-1.5">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-3 w-72 max-w-full" />
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-14">
+        <div className="space-y-6 lg:order-last">
+          <Skeleton className="h-72 w-full rounded-2xl" />
         </div>
-        <SeatMapSkeleton />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-7 w-64 max-w-full" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Skeleton className="h-20 w-full rounded-2xl" />
+          <div className="space-y-1.5">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+          <div className="space-y-4 rounded-2xl border border-ink-800 bg-ink-900/50 p-5">
+            <Skeleton className="h-6 w-40" />
+            <SeatMapSkeleton />
+          </div>
+        </div>
       </div>
     </LoadingRegion>
   );
