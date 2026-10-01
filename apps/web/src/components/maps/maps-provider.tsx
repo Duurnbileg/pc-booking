@@ -26,6 +26,10 @@ export function cafeLatLng(location: {
   return { lat: location.lat, lng: location.lng };
 }
 
+export function directionsUrl(position: LatLng): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${position.lat},${position.lng}`;
+}
+
 export function MapsProvider({ children }: { children: ReactNode }) {
   if (!GOOGLE_MAPS_API_KEY) return <>{children}</>;
   return (

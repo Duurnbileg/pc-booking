@@ -49,6 +49,7 @@ export function CafePricingCards({ cafe }: { cafe: Cafe }) {
           variant="hall"
           tier={hall}
           legacySpecs={hasTierSpecs ? undefined : cafe.displaySpecs}
+          className={vip ? undefined : "sm:col-span-2"}
         />
         {vip ? <TierCard variant="vip" tier={vip} /> : null}
       </div>
@@ -60,10 +61,12 @@ function TierCard({
   variant,
   tier,
   legacySpecs,
+  className,
 }: {
   variant: TierVariant;
   tier: PricingTier;
   legacySpecs?: string;
+  className?: string;
 }) {
   const { t } = useLocale();
   const styles = TIER_STYLES[variant];
@@ -72,52 +75,57 @@ function TierCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-2xl border p-5 shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-0.5",
+        "relative overflow-hidden rounded-2xl border p-4 transition duration-300",
         styles.card,
+        className,
       )}
     >
       <div
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full blur-3xl",
+          "pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full blur-3xl",
           styles.glow,
         )}
       />
-      <div className="relative flex items-baseline justify-between gap-3">
-        <h3
-          className={cn(
-            "inline-flex items-center gap-2 font-display text-xl font-semibold",
-            styles.title,
-          )}
-        >
-          {variant === "vip" ? <Crown className="h-5 w-5" /> : null}
-          {t(variant === "vip" ? "cafe.vip" : "cafe.hall")}
-        </h3>
-        <p className="font-display text-2xl font-bold text-ink-100">
+      <div className="relative flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <h3
+            className={cn(
+              "inline-flex items-center gap-1.5 font-display text-lg font-semibold",
+              styles.title,
+            )}
+          >
+            {variant === "vip" ? <Crown className="h-4 w-4" /> : null}
+            {t(variant === "vip" ? "cafe.vip" : "cafe.hall")}
+          </h3>
+          {tier.pcs > 0 ? (
+            <span className="rounded-full bg-ink-950/60 px-2 py-0.5 text-xs text-ink-300">
+              {t("home.pcs", { n: tier.pcs })}
+            </span>
+          ) : null}
+        </div>
+        <p className="shrink-0 font-display text-xl font-bold text-ink-100">
           {formatMnt(tier.price)}
-          <span className="ml-0.5 text-sm font-normal text-ink-500">
-            {t("home.perHour")}
-          </span>
+          <span className="ml-0.5 text-xs font-normal text-ink-500">{t("home.perHour")}</span>
         </p>
       </div>
 
       {rows.length ? (
-        <ul className="relative mt-4 space-y-2">
+        <dl className="relative mt-3 grid grid-cols-2 gap-2">
           {rows.map(({ key, icon: Icon, iconClass }) => (
-            <li
-              key={key}
-              className="flex items-center justify-between gap-3 rounded-xl bg-ink-950/60 px-4 py-3 text-sm"
-            >
-              <span className="inline-flex items-center gap-2.5 text-ink-500">
-                <Icon className={cn("h-4 w-4", iconClass)} />
+            <div key={key} className="min-w-0 rounded-lg bg-ink-950/60 px-3 py-2">
+              <dt className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-ink-500">
+                <Icon className={cn("h-3.5 w-3.5", iconClass)} />
                 {t(`cafe.${key}`)}
-              </span>
-              <span className="text-right font-medium text-ink-100">{tier[key]}</span>
-            </li>
+              </dt>
+              <dd title={tier[key]} className="mt-0.5 truncate text-sm font-medium text-ink-100">
+                {tier[key]}
+              </dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       ) : legacySpecs ? (
-        <p className="relative mt-4 rounded-xl bg-ink-950/60 px-4 py-3 text-sm text-ink-300">
+        <p className="relative mt-3 rounded-lg bg-ink-950/60 px-3 py-2 text-sm text-ink-300">
           {legacySpecs}
         </p>
       ) : null}

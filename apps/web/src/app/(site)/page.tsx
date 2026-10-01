@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowRight } from "lucide-react";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
@@ -102,9 +104,23 @@ function HomeContent() {
       <StatsStrip cafes={allCafes.data?.cafes ?? []} loading={allCafes.isLoading} />
 
       <section className="space-y-5">
-        <h2 className="font-display text-2xl text-ink-100">
-          {t("map.nearResults", { r: NEARBY_RADIUS_KM })}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-2xl text-ink-100">
+            {t("map.nearResults", { r: NEARBY_RADIUS_KM })}
+          </h2>
+          <Link
+            href="/search"
+            className="group inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent hover:text-ink-950"
+          >
+            {t("home.viewAllCafes")}
+            {allCafes.data?.cafes.length ? (
+              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs tabular-nums group-hover:bg-ink-950/20">
+                {allCafes.data.cafes.length}
+              </span>
+            ) : null}
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
 
         {geoError ? (
           <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-ink-500">

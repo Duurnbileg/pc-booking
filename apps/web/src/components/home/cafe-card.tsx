@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MapPin, Monitor, Navigation } from "lucide-react";
+import { ArrowRight, MapPin, Navigation } from "lucide-react";
 import type { Cafe } from "@/lib/types";
 import { districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { AvailabilityBadge } from "@/components/availability-badge";
 
 function cafeBlurb(cafe: Cafe): string {
   const parts: string[] = [];
@@ -58,10 +59,7 @@ export function CafeCard({ cafe }: { cafe: Cafe }) {
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-700 bg-ink-800/60 px-2.5 py-1 text-ink-100">
-            <Monitor className="h-3.5 w-3.5 text-accent" />
-            {t("home.pcs", { n: cafe.pcCount ?? 0 })}
-          </span>
+          <AvailabilityBadge available={cafe.availablePcs} total={cafe.pcCount ?? 0} />
           {district ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-700 bg-ink-800/60 px-2.5 py-1 text-ink-100">
               <MapPin className="h-3.5 w-3.5 text-accent" />
