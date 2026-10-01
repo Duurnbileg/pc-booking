@@ -123,7 +123,7 @@ export function LocationPicker({
                 if (latLng) onChange(latLng);
               }}
             >
-              <Pin background="#3ddc97" borderColor="#2bb87a" glyphColor="#0b0f14" />
+              <Pin background="#4f9dff" borderColor="#3b82f6" glyphColor="#0b0f14" />
             </AdvancedMarker>
           ) : null}
         </Map>

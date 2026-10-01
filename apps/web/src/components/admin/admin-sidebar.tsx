@@ -83,7 +83,7 @@ function SidebarContent({
         <BrandMark size={32} />
         <div className={cn("leading-tight", labelClass)}>
           <p className="text-sm font-semibold text-slate-900">
-            Pick<span className="text-emerald-600">PC</span>
+            Pick<span className="text-blue-600">PC</span>
           </p>
           <p className="text-xs text-slate-500">{t("dash.adminPanel")}</p>
         </div>

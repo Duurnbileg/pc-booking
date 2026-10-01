@@ -25,7 +25,7 @@ export function CafeCard({ cafe }: { cafe: Cafe }) {
   return (
     <Link
       href={`/cafes/${cafe.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-ink-800 bg-ink-900/60 shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-[0_20px_50px_rgba(61,220,151,0.12)]"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-ink-800 bg-ink-900/60 shadow-[0_12px_40px_rgba(0,0,0,0.25)] transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-[0_20px_50px_rgba(79,157,255,0.12)]"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-ink-800">
         {cover ? (

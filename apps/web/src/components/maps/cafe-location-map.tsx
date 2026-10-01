@@ -41,7 +41,7 @@ export function CafeLocationMap({
         className="h-full w-full"
       >
         <AdvancedMarker position={position} title={title}>
-          <Pin background="#3ddc97" borderColor="#2bb87a" glyphColor="#0b0f14" />
+          <Pin background="#4f9dff" borderColor="#3b82f6" glyphColor="#0b0f14" />
         </AdvancedMarker>
       </Map>
     </div>

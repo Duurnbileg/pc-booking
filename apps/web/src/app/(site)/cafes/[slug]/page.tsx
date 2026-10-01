@@ -196,7 +196,7 @@ function InfoCard({
     </>
   );
   const className =
-    "group flex items-start gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_12px_40px_rgba(61,220,151,0.1)]";
+    "group flex items-start gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_12px_40px_rgba(79,157,255,0.1)]";
 
   return href ? (
     <a href={href} target="_blank" rel="noopener noreferrer" className={className}>

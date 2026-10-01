@@ -278,7 +278,7 @@ type CafeFormProps = {
 const FORM_STYLES = {
   dark: {
     input:
-      "w-full rounded-xl border border-ink-700 bg-ink-950/80 px-3 py-2.5 text-ink-100 disabled:opacity-60",
+      "w-full rounded-xl border border-ink-700 bg-ink-950/80 px-3 py-2.5 text-ink-100 focus:border-accent disabled:opacity-60",
     label: "text-sm font-medium text-ink-100",
     muted: "text-ink-500",
     badge: "rounded-full border border-ink-700 bg-ink-900/60 text-ink-100",
@@ -309,7 +309,7 @@ const FORM_STYLES = {
       vip: "border-amber-200 bg-amber-50/60",
     },
     tierTitle: {
-      hall: "text-emerald-700",
+      hall: "text-blue-700",
       vip: "text-amber-700",
     },
     tierRemoveBtn: "rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700",
