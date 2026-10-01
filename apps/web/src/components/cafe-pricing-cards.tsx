@@ -25,7 +25,7 @@ export const TIER_STYLES: Record<
 > = {
   hall: {
     title: "text-accent",
-    card: "border-ink-800 bg-ink-900/60 hover:border-accent/50 hover:shadow-[0_20px_50px_rgba(61,220,151,0.12)]",
+    card: "border-ink-800 bg-ink-900/60 hover:border-accent/50 hover:shadow-[0_20px_50px_rgba(79,157,255,0.12)]",
     glow: "bg-accent/10",
   },
   vip: {

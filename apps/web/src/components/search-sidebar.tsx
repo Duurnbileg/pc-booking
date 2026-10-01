@@ -189,7 +189,7 @@ function CheckRow({
         className={
           round
             ? "h-4 w-4 appearance-none rounded-full border border-ink-500 checked:border-[5px] checked:border-accent"
-            : "h-4 w-4 accent-[#3ddc97]"
+            : "h-4 w-4 accent-accent"
         }
       />
       {children}

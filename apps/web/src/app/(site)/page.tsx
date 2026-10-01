@@ -85,7 +85,7 @@ function HomeContent() {
         </div>
 
         <div className="mx-auto max-w-5xl space-y-6 text-center">
-          <h1 className="text-balance bg-gradient-to-r from-accent via-emerald-300 to-sky-400 bg-clip-text pb-2 font-display text-5xl font-bold leading-tight tracking-tight text-transparent sm:text-7xl">
+          <h1 className="text-balance bg-gradient-to-r from-accent via-sky-300 to-indigo-300 bg-clip-text pb-2 font-display text-5xl font-bold leading-tight tracking-tight text-transparent sm:text-7xl">
             {t("home.heroTitle")}
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-ink-300 sm:text-xl">{t("home.tagline")}</p>

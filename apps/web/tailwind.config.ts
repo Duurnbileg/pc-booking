@@ -14,8 +14,8 @@ const config = {
           100: "#e8eef5",
         },
         accent: {
-          DEFAULT: "#3ddc97",
-          dim: "#2bb87a",
+          DEFAULT: "#4f9dff",
+          dim: "#3b82f6",
         },
         muted: "#1a2330",
         status: {

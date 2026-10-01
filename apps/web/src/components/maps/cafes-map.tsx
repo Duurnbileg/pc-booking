@@ -86,7 +86,7 @@ export function CafesMap({
             title={cafe.name}
             onClick={() => setSelectedId(cafe.id)}
           >
-            <Pin background="#3ddc97" borderColor="#2bb87a" glyphColor="#0b0f14" />
+            <Pin background="#4f9dff" borderColor="#3b82f6" glyphColor="#0b0f14" />
           </AdvancedMarker>
         ))}
 
@@ -128,7 +128,7 @@ export function CafesMap({
               ) : null}
               <Link
                 href={`/cafes/${selected.cafe.slug}`}
-                className="inline-block pt-1 font-medium text-emerald-700 hover:underline"
+                className="inline-block pt-1 font-medium text-blue-700 hover:underline"
               >
                 {t("home.view")}
               </Link>
