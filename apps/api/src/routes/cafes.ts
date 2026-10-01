@@ -206,8 +206,12 @@ cafesRouter.get("/", async (req, res) => {
         })
       : cafes;
 
+  const limit = queryNumber(req.query.limit);
+  const limited =
+    limit !== undefined ? matched.slice(0, Math.min(Math.max(Math.floor(limit), 1), 100)) : matched;
+
   res.json({
-    cafes: matched.map((c) => {
+    cafes: limited.map((c) => {
       const serialized = serializeCafe(c, {
         availablePcs: counts.get(c._id.toString())?.available,
       });

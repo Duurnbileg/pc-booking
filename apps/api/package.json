@@ -8,6 +8,7 @@
     "build": "pnpm --filter @pc-booking/shared build && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "seed": "tsx src/seed.ts",
+    "seed:gogame": "tsx src/seed-gogame.ts",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

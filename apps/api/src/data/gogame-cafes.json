@@ -1,0 +1,833 @@
+[
+  {
+    "gogameId": "212f4dde-5363-4493-8875-32ec75e3df15",
+    "icafeCloudId": 89329,
+    "name": "123 Esport Center",
+    "slug": "123-esport-center",
+    "description": "Өдөр бүр захиалга авч байна та бүхэн өргөнөөр үйлчлүүлээрэй ⌚⏰\n🤩🤩Багаараа ирж хоног тоглоод, бэлэг аваарай 👇👇\n🕵♀5 хүн хоног авбал 4 + 1 ҮНЭГҮЙ (4-ийн үнээр 5-уулаа)\n🕵♀10 хүн хоног авбал 8 + 2 ҮНЭГҮЙ (8-ын үнээр 10-уулаа)\n📍Хаяг: Өргөө кино театраас доош уруудаад Чингүнжавын хөшөөний баруун талд\n☎Утас: 9456 0123",
+    "address": "Өргөө кино театраас доош уруудаад Чингүнжавын хөшөөний баруун талд, Баянгол дүүрэг, Улаанбаатар",
+    "district": "BAYANGOL",
+    "phone": "94560123",
+    "coordinates": [
+      106.87568851842659,
+      47.91890282753247
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1776397495066/1776397481461-oscx1j.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1776397497624/1776397484020-7ol2mt.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1776397499456/1776397485848-bc7knp.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1776397501309/1776397487693-k10j4d.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1776397539898/1776397526311-n35bqj.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1776397542240/1776397528636-bagtbz.jpg"
+    ],
+    "facebook": "https://www.facebook.com/123esportcenter",
+    "pricing": {
+      "hall": {
+        "price": 6000,
+        "pcs": 20,
+        "gpu": "RTX 5070Ti",
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5070Ti",
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "4d09d9db-939a-451a-96a1-bf9a26a167e7",
+    "icafeCloudId": 87049,
+    "name": "BASE Esports Center",
+    "slug": "base-esports-center",
+    "description": "За Админ нь одоо бүх VIP өрөөнүүдээ танилцуулъя 😅\n✔SOLO VIP ROOM - Зөвхөн нэг хүнд зориулсан өндөр үзүүлэлттэй вип өрөө. \n✔TRIO VIP ROOM - Хамгийн эрэлттэй 3 найзын өрөө, хамгийн Best өрөө шүү\n✔SQAUD VIP ROOM -  5 аараа суух өндөр үзүүлэлт бүхий вип өрөөнүүд\n✔TEAM VIP ROOM - 6 хүний өрөө. Team + Coach or 3 VS 3 😜\n✔PARTY VIP - Мэдээж 10 аараа бужигнах хамгийн том өрөө гээд боломжит бүх суудалтай ВИП өрөөнүүд байдаг шүү 🤟 \nМэдээж өрөө болгон AC тэй ❄ өө нээрээ бүх өрөө маань Dual дэлгэцтэй шүү 🖥🖥 хоёр дахь дэлгэцээрээ сошиал бүх акк аа оруулаад гоё байх боломжтой. \nНээлтийн урамшуулал: \nACC цэнэглэлт бүрт 30%-70% БОНУС бэлэглэнэ 😮\nӨдрийн цаг 50% хямдралтай 👏 \nХоног заал - 15к\nВИП өрөө - 20к \nVIP өрөө үзүүлэлт: 🔥\nCPU - AMD Ryzen 9700X \nRAM - 32GB \nGPU - RTX 5070\nMOUSE - Zowie ec3c\nMONITOR - Benq 400Hz \nKEYBOARD - ATK A87 PRO\nHEADSET - HyperX Cloud2\nХаяг : ТБД Андууд, Төмөр замын дээд сургуулийн зүүн талд BASE ESPORTS CENTER \nУтас: 99727030",
+    "address": "ТБД Андууд, Төмөр замын дээд сургуулийн зүүн талд BASE ESPORTS CENTER, Баянгол дүүрэг, Улаанбаатар",
+    "district": "BAYANGOL",
+    "phone": "99727030",
+    "coordinates": [
+      106.885177287743,
+      47.9155914808404
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/4d09d9db-939a-451a-96a1-bf9a26a167e7/1774704469518-esl1gh.jpg",
+      "https://gogame.mn/uploads/4d09d9db-939a-451a-96a1-bf9a26a167e7/1774704472400-qdw6tu.jpg",
+      "https://gogame.mn/uploads/4d09d9db-939a-451a-96a1-bf9a26a167e7/1774704475442-pqpbk0.jpg",
+      "https://gogame.mn/uploads/4d09d9db-939a-451a-96a1-bf9a26a167e7/1774704477519-libtpn.jpg"
+    ],
+    "facebook": "https://www.facebook.com/Baseesportscenter",
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 8000,
+        "pcs": 10,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 9600X",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "071deb7c-ed49-412e-9506-467ddc4c98d1",
+    "icafeCloudId": 82645,
+    "name": "Genesis E-sport",
+    "slug": "genesis-e-sport",
+    "description": "GENESIS E-SPORT\nЗахиалгын утас: 97009744\nЦагийн тариф\nЗаал - 2,000₮ /16:00 цаг хүртэл/\nVIP - 3,500₮ /16:00 цаг хүртэл/\nStage - 5,000₮ /16:00 цаг хүртэл/\nMember account\n  10,000₮ 10% Урамшуулал\n  20,000₮ 20% Урамшуулал\n  30,000₮ 30% Урамшуулал\n  40,000₮ 40% Урамшуулал\n  50,000₮ 50% Урамшуулал\n  100,000₮ 100% Урамшуулал\nХоногийн тариф: /11:00-08:00 цаг/\nЗаал - 15,000₮\nVIP - 25,000₮\nStage-35,000₮\nХаяг: Алтай хотхоны урд талд Магнолиа оффис 4 давхарт\nhttps://maps.app.goo.gl/AaZDCviz2EQdgi8T7",
+    "address": "Алтай хотхоны урд талд Магнолиа оффис 4 давхарт, Баянгол дүүрэг, Улаанбаатар",
+    "district": "BAYANGOL",
+    "phone": "97009744",
+    "coordinates": [
+      106.89044797246227,
+      47.90208469158766
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1777995640591/1777995640901-ibawdi.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1777995642223/1777995642427-47bten.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1777995643835/1777995644037-oy9wq7.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1777995645791/1777995645994-98lb4d.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61574641598497",
+    "pricing": {
+      "hall": {
+        "price": 3000,
+        "pcs": 20,
+        "gpu": "RTX 4060Ti",
+        "cpu": "Intel - Core-i5-14600KF",
+        "ram": "32GB DDR5",
+        "monitor": "Asus 280HZ"
+      },
+      "vip": {
+        "price": 5000,
+        "pcs": 10,
+        "gpu": "RTX 4060Ti",
+        "cpu": "Intel - Core-i5-14600KF",
+        "ram": "32GB DDR5",
+        "monitor": "Asus 280HZ"
+      }
+    }
+  },
+  {
+    "gogameId": "b7215cbe-0c9a-412c-aeb6-308ac99b8634",
+    "icafeCloudId": 89031,
+    "name": "Nebula e-Sports Center",
+    "slug": "nebula-e-sports-center",
+    "description": "🎮 Заал - 3,000₮\n💎 VIP - 5,000₮\n🖥 Заал: Нийт 24 PC\n😎 VIP: Нийт 3 өрөө\n🌙 Night Pass 23:00-08:00 Заал-20K, VIP-25K\n📍 Хаяг: Баянгол дүүрэг 32-р хороо, Хорооллын эцэс Дүүхээ төвөөр урагшаа уруудаад АОС7 байр /93-р сургууль зүүн талд/ \n☎ Захиалга авах утас: 8875-8355",
+    "address": "Баянгол дүүрэг 32-р хороо, Хорооллын эцэс Дүүхээ төвөөр урагшаа уруудаад АОС7 байр /93-р сургууль зүүн талд/, Баянгол дүүрэг, Улаанбаатар",
+    "district": "BAYANGOL",
+    "phone": "88758355",
+    "coordinates": [
+      106.87032946916682,
+      47.91971486790403
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1775657107843/1775657107935-vztayj.png",
+      "https://gogame.mn/uploads/cafe/temp-1775657110112/1775657110197-cmho3m.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775657111798/1775657111927-f25cnv.jpg",
+      "https://gogame.mn/uploads/cafe/b7215cbe-0c9a-412c-aeb6-308ac99b8634/1781621500439-mddtdd.jpg",
+      "https://gogame.mn/uploads/cafe/b7215cbe-0c9a-412c-aeb6-308ac99b8634/1781621502255-oncjve.jpg",
+      "https://gogame.mn/uploads/cafe/b7215cbe-0c9a-412c-aeb6-308ac99b8634/1781621503781-bzi7ea.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61586692275860&mibextid=wwXIfr&rdid=lcmrQmWzKORcJNND#",
+    "pricing": {
+      "hall": {
+        "price": 3000,
+        "pcs": 20,
+        "gpu": "RTX 4060Ti",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR4",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 5000,
+        "pcs": 10,
+        "gpu": "RTX 5060",
+        "cpu": "Intel - Core-i5-14600KF",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "d92ccf0b-3079-49a1-a24e-8f8df450986e",
+    "icafeCloudId": 88851,
+    "name": "ARES Gaming Center",
+    "slug": "ares-gaming-center",
+    "description": "New \"Ares gaming center\" open now\nМанай хаяг Баянзүрх дүүрэг, 13р хороолол, Манлай баатар Дамдинсүрэн гудамж Wings Club төвийн 2 давхарт ☺\n(13р хороололын голын зам дагуу \"Дархан минж\" төвийн хажууд)\n- 80788905\nPLAY IT ▶\nLOVE IT 🤍\nNEVER STOP⛔",
+    "address": "Баянзүрх дүүрэг, 13р хороолол, Манлай баатар Дамдинсүрэн гудамж Wings Club төвийн 2 давхарт ☺, Баянзүрх дүүрэг, Улаанбаатар",
+    "district": "BAYANZURKH",
+    "phone": "80788905",
+    "coordinates": [
+      106.942685839577,
+      47.9128589705837
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829025002-jkck3h.jpg",
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829032851-fa9lcd.jpg",
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829045017-z9t66a.jpg",
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829053876-7r2xds.jpg",
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829056590-1ibmnt.jpg",
+      "https://gogame.mn/uploads/d92ccf0b-3079-49a1-a24e-8f8df450986e/1774829060324-ueacw8.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=100083181648000",
+    "pricing": {
+      "hall": {
+        "price": 4000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 9600X",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 9700X",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "4bf433bf-bfb4-49e8-98a7-8741b367d41e",
+    "icafeCloudId": 90459,
+    "name": "Khan Esports Hub",
+    "slug": "khan-esports-hub",
+    "description": "🔥 KHAN ESPORTS CENTER НЭЭЛТЭЭ ХИЙЖ БАЙНА! 🔥\n2026.06.11-ээс эхлэн Khan Esports Center албан ёсоор та бүхэндээ үүд хаалгаа нээж байна!\nНээлтийн урамшуулал:\n💥 mypcKhan promo кодыг ашиглаад\nанхны цэнэглэлтээсээ 100% BONUS аваарай! \n2026.06.21 хүртэл хүчинтэй тул та яараарай. \nМанай gaming center-ийн үзүүлэлт:\n⚡ Ryzen 7 7800X3D\n🎮 RTX 5070\n🖱 ZOWIE EC3\n🖥 ZOWIE BenQ 400Hz monitor\n🎧 HyperX Cloud II\nНийт 25 өндөр хүчин чадалтай ком-той.\nМөн найзуудаараа тухтай тоглох боломжтой:\n👑 5-аараа ордог VIP өрөө\n🔥 Trio өрөө\nCS2, Valorant болон competitive gaming-д зориулсан premium орчин, хүчирхэг setup, тухтай өрөөнүүд таныг хүлээж байна.\n📍 Khan Esports Center\n🚀 Нээлт: 2026.06.11\n🎁 Promo code: mypcKhan\nНайзуудаа tag хийгээд нээлтэн дээр уулзацгаая! 🔥",
+    "address": "Баянзүрх дүүрэг, Улаанбаатар",
+    "district": "BAYANZURKH",
+    "phone": "86570815",
+    "coordinates": [
+      106.94862927624052,
+      47.90454850038203
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1781157464784/1781157453289-mmlhl0.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1781157468438/1781157457026-g0scvk.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1781157471479/1781157460056-h9k3w5.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1781157473589/1781157462186-eoe27e.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1781157475574/1781157464097-dwuxdn.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1781157477965/1781157466507-pyxmy2.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61590624155121",
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      },
+      "vip": {
+        "price": 7000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6",
+    "icafeCloudId": 85615,
+    "name": "ZETA Esport Gaming Center",
+    "slug": "zeta-esport-gaming-center",
+    "description": "🩵ZETA ESPORT GAMING CENTER🩵\n🕹 Hall everytime 1 цаг-₮3000 🤭\n🕹 Vip 09:00-17:00 1 цаг-₮4000 🫣\n🕹 Vip 17:00~ 1 цаг-₮7.000🤗\n🌇 Day pass Hall-₮15.000 Vip-₮20.000\n🌃Nightpass Hall-₮15.000 Vip-₮20.000\n⌨Member account bonus 🫂\n₮10.000-10%\n₮20.000-20%\n₮50.000-50%\n₮200.000-100% \n~Ryzen 7 9700x\n~HyperX Cloud II\n~32gb 6000mHz\n~Asus RTX 5070 12gb\n~BenQ 400hz\n~EC3-C mouse\n~Sharker V.2\nХаяг: Sansar E-Mart баруун талд 86685010",
+    "address": "Sansar E-Mart баруун талд, Баянзүрх дүүрэг, Улаанбаатар",
+    "district": "BAYANZURKH",
+    "phone": "86685010",
+    "coordinates": [
+      106.930479960039,
+      47.9225048696029
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784177496-jc5r4y.jpg",
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784182693-xyh5e4.jpg",
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784184618-d7d367.jpg",
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784186500-v3sdro.jpg",
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784188679-zzm15q.jpg",
+      "https://gogame.mn/uploads/1b8bc041-86a8-49f8-a29f-3d50f9eb4ff6/1774784191602-rzl00s.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 3000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 360Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 9700X",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e",
+    "icafeCloudId": 86717,
+    "name": "MGL Optic GaminG",
+    "slug": "mgl-optic-gaming",
+    "description": "Сансарт шинээр үүд хаалгаа нээлээ. Захиалга авах утас: 95089699\nЗаал : үзүүлэлт\nCPU - i7-14700F\nASUS PRIME B760M-KD5\nG.Skill TridentZ5 16x2\nRTX 5070\nBENQ 400hz\nCloud 3\nZowie ec3\nGaming chair\n Цагийн үнэ : 4000\nВип : үзүүлэлт \nCPU - i7-14700F\nASUS PRIME B760M-KD5\nG.Skill TridentZ5 16x2\nRTX 5070\nBENQ 400hz\nCloud 3\nZowie ec3\nGaming chair\n Цагийн үнэ : 6000\nВип+ : үзүүлэлт\nCPU - i7-14700F\nASUS PRIME B760M-KD5\nG.Skill TridentZ5 16x2\nRTX 5070\nBENQ 600hz\nCloud 3\nZowie ec3\nGaming chair\n Цагийн үнэ : 7000",
+    "address": "Баянзүрх дүүрэг, Улаанбаатар",
+    "district": "BAYANZURKH",
+    "phone": "95089699",
+    "coordinates": [
+      106.942659303152,
+      47.9227509960141
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773931484-ni7o5y.jpg",
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773936883-dgtsv8.jpg",
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773942043-m9lzl5.jpg",
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773944214-n1rp0p.jpg",
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773947138-vpss4x.jpg",
+      "https://gogame.mn/uploads/53aef0e3-ef0e-4b6f-b6e2-d6c79bb6154e/1774773959602-60u12m.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 4000,
+        "pcs": 20,
+        "gpu": "RTX 5070",
+        "cpu": "Intel - Core i7-14700F",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "Intel - Core i7-14700F",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "50ce6d8b-d4c3-4716-8e7b-b9290b864575",
+    "icafeCloudId": 79943,
+    "name": "Hardmode esport",
+    "slug": "hardmode-esport",
+    "description": "",
+    "address": "Баянзүрх дүүрэг, Улаанбаатар",
+    "district": "BAYANZURKH",
+    "phone": "80589393",
+    "coordinates": [
+      106.937062179702,
+      47.91839684326
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/50ce6d8b-d4c3-4716-8e7b-b9290b864575/1774711612311-20e8fh.jpg",
+      "https://gogame.mn/uploads/50ce6d8b-d4c3-4716-8e7b-b9290b864575/1774711624193-2ecf4q.jpg",
+      "https://gogame.mn/uploads/50ce6d8b-d4c3-4716-8e7b-b9290b864575/1774711663321-6jh6um.jpg",
+      "https://gogame.mn/uploads/50ce6d8b-d4c3-4716-8e7b-b9290b864575/1774711682029-jgyrlv.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 3000,
+        "pcs": 20,
+        "gpu": "RTX 4060",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "Asus 280HZ"
+      },
+      "vip": {
+        "price": 4000,
+        "pcs": 10,
+        "gpu": "RTX 4060Ti",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "BENQ 240Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "7939b369-cf80-4fc2-90ec-5a1cc4173006",
+    "icafeCloudId": null,
+    "name": "PGaming e-Sport Center",
+    "slug": "pgaming-e-sport-center",
+    "description": "Манай P GAMING E-SPORT CENTER -ийн үйл ажиллагаа хэвийн явагдаж байна. Өндөр үзүүлэлт, тав тухтай орчин таныг хүлээж байна.\nМөн шөнийн 01:00 цагаас оройн 17:00 цаг хүртэл Member account хямдрал 50% \nЗахиалгын утас: 9944-1791\nКомпъютерийн үзүүлэлт:\n-CPU - AMD 7 Ryzen 9800x3D\n-RAM - Corsair 32GB 6000MHZ\n-GPU - ASUS PRIME RTX 5070TI \n-Monitor - Benq XL2586X+ (600HZ)\n-Mouse: ATK A9 ULTRA PINK\n-Keyboard: ATTACK SHARK X820ULTRA\n-Headset: Hyperx Cloud3 PINK\n1 давхарт 42ком ( Заал )\n2 давхарт 66 ком( Заал )\n3 давхарт 92ком (13 VIP өрөө) \nStream room (2 өрөө)\nНийт 200 компьютер ажиллаж байна.\n1 цагийн үнэ(хямдралтай үеэр)\nЗаал 1/2 давхар 3,000 \nVIP 3н давхар 4,000\nStream room 6,000\nХаяг : 11-р хороолол, 2 дугаар сургуулийн ард, xуучнаар дөрвөн уул захтай байр,",
+    "address": "11-р хороолол, 2 дугаар сургуулийн ард, xуучнаар дөрвөн уул захтай байр,, Сүхбаатар дүүрэг, Улаанбаатар",
+    "district": "SUKHBAATAR",
+    "phone": "72279911",
+    "coordinates": [
+      106.92533531208026,
+      47.92848816531372
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345803444-5cykcy.jpg",
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345806644-zo0zd8.jpg",
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345808248-0m1ip9.jpg",
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345814582-6ebmoc.jpg",
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345816379-rfdyyu.jpg",
+      "https://gogame.mn/uploads/cafe/7939b369-cf80-4fc2-90ec-5a1cc4173006/1781345818116-r99bj1.jpg"
+    ],
+    "facebook": "https://www.facebook.com/pgaming9911",
+    "pricing": {
+      "hall": {
+        "price": 6000,
+        "pcs": 20,
+        "gpu": "RTX 5070Ti",
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 600Hz"
+      },
+      "vip": {
+        "price": 8000,
+        "pcs": 10,
+        "gpu": "RTX 5070Ti",
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 600Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "69d3c607-1612-4fe6-8324-ec3676d1ec62",
+    "icafeCloudId": 87979,
+    "name": "Retake Gaming Center",
+    "slug": "retake-gaming-center",
+    "description": "",
+    "address": "Сүхбаатар дүүрэг, Улаанбаатар",
+    "district": "SUKHBAATAR",
+    "phone": "9898 2003",
+    "coordinates": [
+      106.91652369696,
+      47.9297019339408
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273329321-tba3dw.jpg",
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273332649-oq4lq9.jpg",
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273334596-gcn5bv.jpg",
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273336208-j27f3b.jpg",
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273337893-i76osc.jpg",
+      "https://gogame.mn/uploads/cafe/69d3c607-1612-4fe6-8324-ec3676d1ec62/1775273339529-c3uywu.jpg"
+    ],
+    "facebook": "https://www.facebook.com/retake.gaming.ulaanbaatar",
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 7500F",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 6500,
+        "pcs": 10,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 7500F",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "9d142963-2609-4cba-a7c0-d46a20030004",
+    "icafeCloudId": 88561,
+    "name": "MAP976",
+    "slug": "map976",
+    "description": "🔥 MAP 976 GAME CENTER 🎮\nGAMING MODE ACTIVATED\n⏰ Цагийн тариф\n🕘 09:00–17:00 → 2,500₮\n🌆 17:00–00:00 → 6,000₮\n🌙 Night Pass → 20,000₮\n🚀 ШИНЭ НЭЭЛТИЙН УРАМШУУЛАЛ\n👉 3-р сар дуустал account нээлгээд\n💥 10% хүртэл бонус аваарай!\n🔥Яагаад MAP 976 гэж?\n✔ Ultra smooth gameplay\n✔ Competitive & casual аль алинд нь тохиромжтой орчин\n✔ Найзуудтайгаа тухтай тоглох VIP суудал\n🎮PS5 тоглох боломжой хүлээлэгийн өрөө \n🚗 Автомашины зогсоолтой\nPro Gaming Setup\n🔥Benq ZOWIE 400hz \n🖥 RTX 5060Ti / 5070\n⚡ Ryzen 7 7800X3D\n🧠 DDR5 32GB RAM\n📺 380–400Hz monitor\n🎧 HyperX | Zowie | ROG gear\n🔥 High FPS – Real Pro Experience\n📍 СБД, Auto Plaza, Дашчойлон хийдийн урд, 54-р байр\n📞 85858102",
+    "address": "Сүхбаатар дүүрэг, Улаанбаатар",
+    "district": "SUKHBAATAR",
+    "phone": "85858102",
+    "coordinates": [
+      106.92023446126547,
+      47.926837355922345
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1775301374395/1775301374480-1dxszb.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775301376409/1775301376539-643vkx.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775301378186/1775301378311-zv96kx.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775301380153/1775301380277-4hfykk.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775301382429/1775301382559-12yy48.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1775301384678/1775301384811-61vufn.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61587002634385&sk=photos",
+    "pricing": {
+      "hall": {
+        "price": 3000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 9600X",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5060Ti",
+        "cpu": "Intel - Core-i5-14600KF",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 380Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "e8d4a7aa-1c98-4e80-a953-96369cb36e63",
+    "icafeCloudId": 86829,
+    "name": "Mono Esport Center",
+    "slug": "mono-esport-center",
+    "description": "🎮 Манай тоглоомын төв шинээр үүд хаалгаа нээж байна 🔥🔥🔥\n🖥 Өндөр үзүүлэлттэй PC\n⚡ Ultra smooth FPS\n🪑 Тав тухтай орчин 6 VIP rooms\n🤝 Найрсаг хамт олон\n🎧 Pro gaming setup\n👥 Duo room\n😱 Member Account 30.000 төгрөгөөр цэнэглээд 30%, 50.000 төгрөг болон түүнээс дээш цэнэглээд 50% бонус аваарай.\n🎁 Цагийн хөнгөлөлт\n🎁 Bonus \n🎁 Early bird, Nightpass\nЗаалны үзүүлэлт:\ni5-14400F, 16GB 6000Mhz, RTX 5060, Asus 310Hz\nVIPs, Duo room:\nAMD Ryzen 7 7800x3D, 32GB 6000Mhz, RTX 5070, Zowie 400Hz\nGear:\n🖱Benq Zowie EC3-C Mouse\n⌨Royal Kludge - R87TKL Mechanical Keyboard\n🎧HyperX Cloud 2 Red\nATK Sky XSoft Gaming Mousepad Black\nSharker Gaming Chair\nЗаал - 1 цагийн 5.000 төгрөг\nVIP - 1 цагийн 8.000 төгрөг\nBest VIP - 1 цагийн 10.000 төгрөг (10 хүний өрөө дотроо ариун цэврийн өрөө, тамхины өрөөтэй)\nDuo room - 1 цагийн 10.000 төгрөг\n🌝 Early bird\n9:00am - 3:00pm\nЗаал - 1 цагийн 3.000 төгрөг\nVIP - 1 цагийн 6.000 төгрөг\nBest VIP - 1 цагийн 8.000 төгрөг\n🌚 Nightpass \n11:00pm - 8:00am\nЗаал - 20.000 төгрөг\nVIP - 35.000 төгрөг\nBest VIP - 40.000 төгрөг\nDuo room - 40.000 төгрөг\n📍Байршил: СБД 1-р хороо Төв номын сангийн урд Central Park 4 давхарт ✨\n📍Google Maps - https://maps.app.goo.gl/MCqCSALx3vrrzYuKA\n⏰ Нээлттэй цаг: 24 цаг\n☎  99210631",
+    "address": "Сүхбаатар дүүрэг, Улаанбаатар",
+    "district": "SUKHBAATAR",
+    "phone": "99210631",
+    "coordinates": [
+      106.915751463173,
+      47.913407801916
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715874132-5uc68m.jpg",
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715878388-tgn45x.jpg",
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715880617-z3zejv.jpg",
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715888189-drad0s.jpg",
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715891299-adzgl9.jpg",
+      "https://gogame.mn/uploads/e8d4a7aa-1c98-4e80-a953-96369cb36e63/1774715893550-ifskvl.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 8000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "3692f498-8603-4c6d-bef2-c3bf900a7868",
+    "icafeCloudId": 88019,
+    "name": "Mega Gaming",
+    "slug": "mega-gaming",
+    "description": "",
+    "address": "Чингэлтэй дүүрэг, Улаанбаатар",
+    "district": "CHINGELTEI",
+    "phone": "9818-2222",
+    "coordinates": [
+      106.906448593993,
+      47.9119176761593
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399433019-ei2ggp.jpg",
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399434888-6hqld8.jpg",
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399436718-izta6r.jpg",
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399438215-97imfo.jpg",
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399439741-9fxaoz.jpg",
+      "https://gogame.mn/uploads/cafe/3692f498-8603-4c6d-bef2-c3bf900a7868/1780399441919-hpnfv4.jpg"
+    ],
+    "facebook": "https://www.facebook.com/reel/2717649418615528",
+    "pricing": {
+      "hall": {
+        "price": 6000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 9600X",
+        "ram": "32GB DDR4",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 9000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR4",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "84b19811-2586-4351-9515-15f8a9b3f310",
+    "icafeCloudId": null,
+    "name": "Nexus 2nd Floor",
+    "slug": "nexus-2nd-floor",
+    "description": "",
+    "address": "Чингэлтэй дүүрэг, Улаанбаатар",
+    "district": "CHINGELTEI",
+    "phone": "75884411",
+    "coordinates": [
+      106.901486502246,
+      47.9226989214339
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/84b19811-2586-4351-9515-15f8a9b3f310/1774716452696-2fu6ym.jpg",
+      "https://gogame.mn/uploads/84b19811-2586-4351-9515-15f8a9b3f310/1774716458151-wburyc.jpg",
+      "https://gogame.mn/uploads/84b19811-2586-4351-9515-15f8a9b3f310/1774716461326-zii14m.jpg",
+      "https://gogame.mn/uploads/84b19811-2586-4351-9515-15f8a9b3f310/1774716464484-4bnhk6.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61576835185423",
+    "pricing": {
+      "hall": {
+        "price": 4000,
+        "pcs": 20,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 9700X",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      },
+      "vip": {
+        "price": 6000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 9800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "60a5ac37-bf53-453b-b5bf-12d9778aefa8",
+    "icafeCloudId": 89687,
+    "name": "Major-19 Esport center",
+    "slug": "major-19-esport-center",
+    "description": "Шинээр нээгдсэн 19-ийн үйлчилгээний төвдөө тоглогч та бүхнийг урьж байна!\nТав тухтай орчин, цэвэрхэн тохижилт, өндөр хүчин чадалтай компьютер, найрсаг үйлчилгээ таныг хүлээж байна.\nМөн бид тоглогчдодоо зориулсан:\n✅ Day Pass\n✅ Night Pass\n✅ Өдрийн урамшуулал\n✅ Шинэ эрхийн бонус\n✅ Тогтмол төрөл бүрийн хямдрал, урамшууллуудыг санал болгож байна.\nДэлгэрэнгүй мэдээллийг чат болон утсаар холбогдон аваарай.",
+    "address": "Хан-Уул дүүрэг, Улаанбаатар",
+    "district": "KHAN_UUL",
+    "phone": "99004109",
+    "coordinates": [
+      106.90155322095342,
+      47.902556663890415
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/temp-1780658934402/1780658934255-6kw3pk.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1780658937242/1780658937097-1dtp1y.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1780658938936/1780658938780-j4p7lh.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1780658940604/1780658940467-jvxp2i.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1780658942092/1780658941880-5m3z9g.jpg",
+      "https://gogame.mn/uploads/cafe/temp-1780658943524/1780658943382-1mnjte.jpg"
+    ],
+    "facebook": "https://www.facebook.com/profile.php?id=61570771439477",
+    "pricing": {
+      "hall": {
+        "price": 6000,
+        "pcs": 20,
+        "gpu": "RTX 5060",
+        "cpu": "AMD Ryzen 5 9600X",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      },
+      "vip": {
+        "price": 8000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 9700X",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "98d05fb7-62e8-4637-8f87-cdd669052c25",
+    "icafeCloudId": 83007,
+    "name": "Fivestar",
+    "slug": "fivestar",
+    "description": "",
+    "address": "Хан-Уул дүүрэг, Улаанбаатар",
+    "district": "KHAN_UUL",
+    "phone": "7727 1717",
+    "coordinates": [
+      106.917798992567,
+      47.8860918479077
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/98d05fb7-62e8-4637-8f87-cdd669052c25/1774709777547-cyxdia.jpg",
+      "https://gogame.mn/uploads/98d05fb7-62e8-4637-8f87-cdd669052c25/1774709780943-0niu7y.jpg",
+      "https://gogame.mn/uploads/98d05fb7-62e8-4637-8f87-cdd669052c25/1774709783015-21z6ia.jpg",
+      "https://gogame.mn/uploads/98d05fb7-62e8-4637-8f87-cdd669052c25/1774709784916-oifefj.jpg",
+      "https://gogame.mn/uploads/98d05fb7-62e8-4637-8f87-cdd669052c25/1774709787035-o7bv8f.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 5060Ti",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "Asus 280HZ"
+      },
+      "vip": {
+        "price": 7000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "Intel - Core i7-14700F",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "0a839df1-7669-4310-8647-2e52d6666c83",
+    "icafeCloudId": null,
+    "name": "GameBar",
+    "slug": "gamebar",
+    "description": "",
+    "address": "Хан-Уул дүүрэг, Улаанбаатар",
+    "district": "KHAN_UUL",
+    "phone": "75885522",
+    "coordinates": [
+      106.929380583296,
+      47.8904302409559
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710076268-gxa080.jpg",
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710079231-8wd887.jpg",
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710081942-k4i6f2.jpg",
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710084916-8w101o.jpg",
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710087124-k7q27i.jpg",
+      "https://gogame.mn/uploads/0a839df1-7669-4310-8647-2e52d6666c83/1774710090023-7k7l3x.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 8000,
+        "pcs": 20,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      },
+      "vip": {
+        "price": 9000,
+        "pcs": 10,
+        "gpu": "RTX 5070",
+        "cpu": "AMD Ryzen 7 7800X3D",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 400Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "c9098836-f792-40fe-b391-2895c3f2e1ba",
+    "icafeCloudId": null,
+    "name": "Hasu E-Sport Gaming Center",
+    "slug": "hasu-e-sport-gaming-center",
+    "description": "Манай HASU GAMING E-SPORT CENTER-ийн үйл ажиллагаа хэвийн явагдаж байна.\nМөн шөнө 01:00-17:00 цаг хүртэл 50% хямдралтай.\n(Зөвхөн Member account-тай хүмүүст)\n40 комьпютер ( Заал )\n10 комьпютер ( VIP )\nнийт 50 компьютер ажиллаж байна.\n1 цагийн үнэ:\n* Заал 5.000₮\n* VIP 7.000₮\nХаяг : ХУД, 25-р хороо.\n(Нисэхийн уулзвараас баруун хойно, Миний сүлжээ дэлгүүрийн шороон замаар ороод Seoul Garden 314-р байр)",
+    "address": "ХУД, 25-р хороо., Сонгинохайрхан дүүрэг, Улаанбаатар",
+    "district": "SONGINOKHAIRKHAN",
+    "phone": "96696790",
+    "coordinates": [
+      106.7808760356718,
+      47.85896095637995
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346202734-999ei9.jpg",
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346204737-mhsdof.jpg",
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346206334-oh67sf.jpg",
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346207791-5e5c0f.jpg",
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346209185-5tulpm.jpg",
+      "https://gogame.mn/uploads/cafe/c9098836-f792-40fe-b391-2895c3f2e1ba/1781346211408-or3t00.jpg"
+    ],
+    "facebook": "https://www.facebook.com/hasugaming1123",
+    "pricing": {
+      "hall": {
+        "price": 5000,
+        "pcs": 20,
+        "gpu": "RTX 4070Ti",
+        "cpu": "i9-14900KF",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 360Hz"
+      },
+      "vip": {
+        "price": 7000,
+        "pcs": 10,
+        "gpu": "RTX 4070Ti",
+        "cpu": "i9-14900KF",
+        "ram": "32GB DDR5",
+        "monitor": "ZOWIE 360Hz"
+      }
+    }
+  },
+  {
+    "gogameId": "bfa0ba5a-3854-49ee-a896-11eb72d18fa7",
+    "icafeCloudId": 78547,
+    "name": "CROSS Gaming center",
+    "slug": "cross-gaming-center",
+    "description": "🏆CROSS PC GAMING – БҮХ ӨРӨӨНҮҮД 🏆\n━━━━━━━━━━━━━━━\n🥇 VIP1 \n🖥 i5-14400F | RTX 4060 Ti | 32GB | 310Hz\n⌨ RK87 + Zowie EC2-C + HyperX Cloud II\n💵 4,500₮/цаг\n━━━━━━━━━━━━━━━\n🥈 VIP2\n🖥 i5-14400F | RTX 4060 Ti | 16GB | 270Hz\n⌨ RK87 + Zowie EC2-C + HyperX Cloud II\n💵 3,500₮/цаг\n━━━━━━━━━━━━━━━\n🥉 ЗААЛ – СТАНДАРТ\n🖥 i5-13400F | RTX 4060 | 16GB | 270Hz\n⌨ RK87 + Logitech G102 + C3 Headset\n💵 2,500₮/цаг\n━━━━━━━━━━━━━━━\n🎮 БҮХ ӨРӨӨ SHARP 270Hz/310Hz МОНИТОРТОЙ!\n🎮 МЕХАНИК KEYBOARD + ПРО МОУС\n🔴 НЭЭЛТТЭЙ: Өдөр бүр 09:00 – 23:00\n📞 Захиалга: 95501373\n📍 Хаяг: Баянхошуу, Жанцан буудал, Буман төв B1-р давхар \"Cross PC gaming\"",
+    "address": "Баянхошуу, Жанцан буудал, Буман төв B1-р давхар \"Cross PC gaming\", Сонгинохайрхан дүүрэг, Улаанбаатар",
+    "district": "SONGINOKHAIRKHAN",
+    "phone": "95501373",
+    "coordinates": [
+      106.841906360831,
+      47.9552704989248
+    ],
+    "is24_7": true,
+    "images": [
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791937975-ym4avp.jpg",
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791944677-kfdmq7.jpg",
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791948535-8gph85.jpg",
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791950672-zcyk1l.jpg",
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791952430-89k1rk.jpg",
+      "https://gogame.mn/uploads/bfa0ba5a-3854-49ee-a896-11eb72d18fa7/1774791954839-405k43.jpg"
+    ],
+    "facebook": null,
+    "pricing": {
+      "hall": {
+        "price": 2500,
+        "pcs": 20,
+        "gpu": "RTX 4060",
+        "cpu": "Intel - Core i5 -13400F",
+        "ram": "16GB DDR5",
+        "monitor": "Asus 280HZ"
+      },
+      "vip": {
+        "price": 4500,
+        "pcs": 10,
+        "gpu": "RTX 4060Ti",
+        "cpu": "Intel - Core i5-14400F",
+        "ram": "32GB DDR5",
+        "monitor": "ASUS 310Hz"
+      }
+    }
+  }
+]

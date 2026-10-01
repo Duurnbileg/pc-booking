@@ -5,6 +5,7 @@ import { User } from "./models/User.js";
 import { Cafe } from "./models/Cafe.js";
 import { PC } from "./models/PC.js";
 import { Integration } from "./models/Integration.js";
+import { importGogameCafes } from "./seed-gogame.js";
 import {
   pricingSummary,
   type CafePricing,
@@ -261,6 +262,8 @@ async function seed() {
       status: "DISCONNECTED",
     });
   }
+
+  await importGogameCafes(owner!._id);
 
   // One pending cafe for admin approve flow
   await Cafe.create({
