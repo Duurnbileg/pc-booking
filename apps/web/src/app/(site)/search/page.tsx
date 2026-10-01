@@ -14,6 +14,7 @@ import { SearchBar } from "@/components/search-bar";
 import { SearchSidebar } from "@/components/search-sidebar";
 import { ResultListSkeleton } from "@/components/skeletons";
 import { CafeCoverFallback, ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { AvailabilityBadge } from "@/components/availability-badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
@@ -170,40 +171,5 @@ function ResultCard({ cafe, live }: { cafe: Cafe; live: boolean }) {
         </div>
       </div>
     </Link>
-  );
-}
-
-function AvailabilityBadge({
-  available,
-  total,
-}: {
-  available: number | null | undefined;
-  total: number;
-}) {
-  const { t } = useLocale();
-  if (available === null || available === undefined) {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-700 px-2.5 py-1 text-xs text-ink-500">
-        {t("search.noLive")}
-      </span>
-    );
-  }
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
-        available > 0
-          ? "border-status-available/40 bg-status-available/10 text-status-available"
-          : "border-status-reserved/40 bg-status-reserved/10 text-status-reserved",
-      )}
-    >
-      <span
-        className={cn(
-          "h-1.5 w-1.5 rounded-full",
-          available > 0 ? "bg-status-available" : "bg-status-reserved",
-        )}
-      />
-      {t("search.available", { a: available, t: total })}
-    </span>
   );
 }

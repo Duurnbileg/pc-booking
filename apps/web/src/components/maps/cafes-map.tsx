@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AdvancedMarker, Circle, ColorScheme, Map, useMap } from "@vis.gl/react-google-maps";
-import { ArrowRight, MapPin, Monitor, Navigation } from "lucide-react";
+import { ArrowRight, MapPin, Navigation } from "lucide-react";
+import { AvailabilityBadge } from "@/components/availability-badge";
 import type { Cafe } from "@/lib/types";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -187,10 +188,11 @@ function CafeHoverCard({ cafe, distanceKm }: { cafe: Cafe; distanceKm?: number }
       </div>
       <div className="space-y-2 p-3">
         <div className="flex flex-wrap gap-1.5 text-[11px] text-ink-100">
-          <span className="inline-flex items-center gap-1 rounded-full bg-ink-800 px-2 py-0.5">
-            <Monitor className="h-3 w-3 text-accent" />
-            {t("home.pcs", { n: cafe.pcCount ?? 0 })}
-          </span>
+          <AvailabilityBadge
+            available={cafe.availablePcs}
+            total={cafe.pcCount ?? 0}
+            className="px-2 py-0.5 text-[11px]"
+          />
           {district ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-ink-800 px-2 py-0.5">
               <MapPin className="h-3 w-3 text-accent" />
