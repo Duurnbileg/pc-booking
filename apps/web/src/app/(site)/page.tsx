@@ -2,12 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { LocateFixed, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { useAuth } from "@/components/auth-provider";
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
@@ -20,7 +18,8 @@ import {
   type LatLng,
 } from "@/components/maps/maps-provider";
 
-const RADIUS_OPTIONS = [1, 3, 5, 10, 20];
+const NEARBY_RADIUS_KM = 1;
+const NEARBY_LIMIT = 6;
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -37,44 +36,48 @@ export default function HomePage() {
 function HomeContent() {
   const { t } = useLocale();
   const [center, setCenter] = useState<LatLng | null>(null);
-  const [radiusKm, setRadiusKm] = useState(5);
-  const [locating, setLocating] = useState(false);
-  const [geoError, setGeoError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(true);
+  const [geoError, setGeoError] = useState<"unsupported" | "denied" | null>(null);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["cafes", center?.lat, center?.lng, radiusKm],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (center) {
-        params.set("lat", String(center.lat));
-        params.set("lng", String(center.lng));
-        params.set("radiusKm", String(radiusKm));
-      }
-      const qs = params.toString();
-      return api<{ cafes: Cafe[] }>(
-        `${API_PATHS.cafes.list}${qs ? `?${qs}` : ""}`,
-      );
-    },
-    placeholderData: keepPreviousData,
+  useEffect(() => {
+    let cancelled = false;
+    getCurrentPosition()
+      .then((pos) => {
+        if (!cancelled) setCenter(pos);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setGeoError(err instanceof Error && err.message === "unsupported" ? "unsupported" : "denied");
+      })
+      .finally(() => {
+        if (!cancelled) setLocating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allCafes = useQuery({
+    queryKey: ["cafes"],
+    queryFn: () => api<{ cafes: Cafe[] }>(API_PATHS.cafes.list),
   });
 
-  const cafes = data?.cafes ?? [];
+  const nearby = useQuery({
+    queryKey: ["cafes", "nearby", center?.lat, center?.lng],
+    queryFn: () => {
+      const params = new URLSearchParams({
+        lat: String(center!.lat),
+        lng: String(center!.lng),
+        radiusKm: String(NEARBY_RADIUS_KM),
+        limit: String(NEARBY_LIMIT),
+      });
+      return api<{ cafes: Cafe[] }>(`${API_PATHS.cafes.list}?${params}`);
+    },
+    enabled: center !== null,
+  });
 
-  async function locateMe() {
-    setGeoError(null);
-    setLocating(true);
-    try {
-      setCenter(await getCurrentPosition());
-    } catch (err) {
-      setGeoError(
-        err instanceof Error && err.message === "unsupported"
-          ? t("map.geoUnsupported")
-          : t("map.permissionDenied"),
-      );
-    } finally {
-      setLocating(false);
-    }
-  }
+  const cafes = nearby.data?.cafes ?? [];
+  const loadingNearby = locating || nearby.isLoading;
 
   return (
     <div className="space-y-14">
@@ -91,70 +94,29 @@ function HomeContent() {
           <p className="mx-auto max-w-2xl text-lg text-ink-300 sm:text-xl">{t("home.tagline")}</p>
         </div>
 
-        <div className="mx-auto mt-8 max-w-4xl space-y-4">
+        <div className="mx-auto mt-8 max-w-4xl">
           <SearchBar />
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={locateMe}
-              disabled={locating}
-              className={cn(
-                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition disabled:opacity-60",
-                center
-                  ? "border-accent bg-accent/10 text-accent"
-                  : "border-ink-700 bg-ink-900/60 text-ink-100 hover:border-accent hover:text-accent",
-              )}
-            >
-              <LocateFixed className={cn("h-4 w-4", locating && "animate-pulse")} />
-              {locating ? t("map.locating") : t("map.nearMe")}
-            </button>
-            <label className="inline-flex items-center gap-2 rounded-full border border-ink-700 bg-ink-900/60 py-1 pl-4 pr-1 text-sm text-ink-300">
-              {t("map.radius")}
-              <select
-                value={radiusKm}
-                onChange={(e) => setRadiusKm(Number(e.target.value))}
-                className="rounded-full bg-ink-800 px-3 py-1 text-ink-100"
-              >
-                {RADIUS_OPTIONS.map((r) => (
-                  <option key={r} value={r}>
-                    {t("map.km", { n: r })}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {center ? (
-              <button
-                type="button"
-                onClick={() => setCenter(null)}
-                className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm text-ink-500 hover:text-ink-100"
-              >
-                <X className="h-4 w-4" />
-                {t("map.clear")}
-              </button>
-            ) : null}
-          </div>
-          {geoError ? (
-            <p className="text-center text-sm text-status-reserved">{geoError}</p>
-          ) : null}
         </div>
       </section>
 
-      <StatsStrip cafes={cafes} loading={isLoading} />
+      <StatsStrip cafes={allCafes.data?.cafes ?? []} loading={allCafes.isLoading} />
 
       <section className="space-y-5">
-        {center ? (
-          <h2 className="font-display text-2xl text-ink-100">
-            {t("map.nearResults", { r: radiusKm })}
-          </h2>
-        ) : null}
+        <h2 className="font-display text-2xl text-ink-100">
+          {t("map.nearResults", { r: NEARBY_RADIUS_KM })}
+        </h2>
 
-        {isLoading ? (
-          <CafeGridSkeleton count={6} />
-        ) : error ? (
+        {geoError ? (
+          <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-ink-500">
+            {geoError === "unsupported" ? t("map.geoUnsupported") : t("map.needLocation")}
+          </p>
+        ) : loadingNearby ? (
+          <CafeGridSkeleton count={NEARBY_LIMIT} />
+        ) : nearby.error ? (
           <p className="text-status-reserved">{t("home.loadError")}</p>
         ) : cafes.length === 0 ? (
           <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-ink-500">
-            {t("home.empty")}
+            {t("map.nearEmpty", { r: NEARBY_RADIUS_KM })}
           </p>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -165,17 +127,13 @@ function HomeContent() {
         )}
       </section>
 
-      {cafes.length > 0 || center ? (
+      {allCafes.data?.cafes.length ? (
         <section className="space-y-4">
-          <div className="space-y-1">
-            <h2 className="font-display text-2xl text-ink-100">{t("home.mapTitle")}</h2>
-            <p className="text-sm text-ink-500">{t("home.mapHint")}</p>
-          </div>
+          <h2 className="font-display text-2xl text-ink-100">{t("home.mapTitle")}</h2>
           <CafesMap
-            cafes={cafes}
+            cafes={allCafes.data.cafes}
             center={center}
-            radiusKm={radiusKm}
-            onPickCenter={setCenter}
+            radiusKm={NEARBY_RADIUS_KM}
             className="h-[420px]"
           />
         </section>

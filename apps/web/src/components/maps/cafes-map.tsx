@@ -1,19 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import {
-  AdvancedMarker,
-  Circle,
-  ColorScheme,
-  InfoWindow,
-  Map,
-  Pin,
-  useMap,
-} from "@vis.gl/react-google-maps";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { AdvancedMarker, Circle, ColorScheme, Map, useMap } from "@vis.gl/react-google-maps";
+import { ArrowRight, MapPin, Monitor, Navigation } from "lucide-react";
 import type { Cafe } from "@/lib/types";
-import { formatMnt } from "@/lib/utils";
-import { useT } from "@/components/locale-provider";
+import { cn, districtLabel, formatMnt } from "@/lib/utils";
+import { useLocale } from "@/components/locale-provider";
 import {
   GOOGLE_MAPS_API_KEY,
   GOOGLE_MAPS_MAP_ID,
@@ -29,36 +22,43 @@ type CafesMapProps = {
   cafes: Cafe[];
   center: LatLng | null;
   radiusKm: number;
-  onPickCenter?: (point: LatLng) => void;
   className?: string;
 };
 
-export function CafesMap({
-  cafes,
-  center,
-  radiusKm,
-  onPickCenter,
-  className,
-}: CafesMapProps) {
-  const t = useT();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+function haversineKm(a: LatLng, b: LatLng): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 6371 * 2 * Math.asin(Math.sqrt(h));
+}
+
+export function CafesMap({ cafes, center, radiusKm, className }: CafesMapProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
 
   const points = useMemo(
     () =>
       cafes.flatMap((cafe) => {
         const pos = cafeLatLng(cafe.location);
-        return pos ? [{ cafe, pos }] : [];
+        if (!pos) return [];
+        const distanceKm = cafe.distanceKm ?? (center ? haversineKm(center, pos) : undefined);
+        return [{ cafe, pos, distanceKm }];
       }),
-    [cafes],
+    [cafes, center],
   );
-  const selected = points.find((p) => p.cafe.id === selectedId) ?? null;
 
   if (!GOOGLE_MAPS_API_KEY) {
     return <MapUnavailable className={className} />;
   }
 
+  const openId = hoveredId ?? pinnedId;
+
   return (
     <div
+      data-cafes-map
       className={`overflow-hidden rounded-2xl border border-ink-800 ${className ?? ""}`}
     >
       <Map
@@ -70,29 +70,14 @@ export function CafesMap({
         gestureHandling="cooperative"
         disableDefaultUI
         zoomControl
-        onClick={(e) => {
-          const latLng = e.detail.latLng;
-          setSelectedId(null);
-          if (latLng && onPickCenter) onPickCenter(latLng);
-        }}
+        onClick={() => setPinnedId(null)}
         className="h-full w-full"
       >
         <FitToContent points={points.map((p) => p.pos)} center={center} radiusKm={radiusKm} />
 
-        {points.map(({ cafe, pos }) => (
-          <AdvancedMarker
-            key={cafe.id}
-            position={pos}
-            title={cafe.name}
-            onClick={() => setSelectedId(cafe.id)}
-          >
-            <Pin background="#4f9dff" borderColor="#3b82f6" glyphColor="#0b0f14" />
-          </AdvancedMarker>
-        ))}
-
         {center ? (
           <>
-            <AdvancedMarker position={center} zIndex={1000}>
+            <AdvancedMarker position={center} zIndex={500}>
               <div className="h-4 w-4 rounded-full border-2 border-white bg-sky-500 shadow-[0_0_0_6px_rgba(14,165,233,0.25)]" />
             </AdvancedMarker>
             <Circle
@@ -108,35 +93,123 @@ export function CafesMap({
           </>
         ) : null}
 
-        {selected ? (
-          <InfoWindow
-            position={selected.pos}
-            pixelOffset={[0, -40]}
-            onCloseClick={() => setSelectedId(null)}
-            headerDisabled
-          >
-            <div className="min-w-[160px] space-y-1 text-[13px] text-gray-900">
-              <p className="font-semibold">{selected.cafe.name}</p>
-              <p>
-                {formatMnt(selected.cafe.pricePerHour)}
-                {t("home.perHour")} · {t("home.pcs", { n: selected.cafe.pcCount ?? 0 })}
-              </p>
-              {typeof selected.cafe.distanceKm === "number" ? (
-                <p className="text-gray-600">
-                  {t("map.distance", { n: selected.cafe.distanceKm.toFixed(1) })}
-                </p>
-              ) : null}
-              <Link
-                href={`/cafes/${selected.cafe.slug}`}
-                className="inline-block pt-1 font-medium text-blue-700 hover:underline"
-              >
-                {t("home.view")}
-              </Link>
-            </div>
-          </InfoWindow>
-        ) : null}
+        {points.map(({ cafe, pos, distanceKm }) => {
+          const open = openId === cafe.id;
+          return (
+            <AdvancedMarker
+              key={cafe.id}
+              position={pos}
+              title={cafe.name}
+              zIndex={open ? 1000 : undefined}
+              onMouseEnter={() => setHoveredId(cafe.id)}
+              onMouseLeave={() => setHoveredId((id) => (id === cafe.id ? null : id))}
+              onClick={() => setPinnedId((id) => (id === cafe.id ? null : cafe.id))}
+            >
+              <div className="relative flex flex-col items-center">
+                {open ? <CafeHoverCard cafe={cafe} distanceKm={distanceKm} /> : null}
+                <CafePin active={open} />
+              </div>
+            </AdvancedMarker>
+          );
+        })}
       </Map>
     </div>
+  );
+}
+
+function CafePin({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="28"
+      height="36"
+      viewBox="0 0 28 36"
+      className={cn("drop-shadow-md transition-transform duration-150", active && "scale-125")}
+      style={{ transformOrigin: "50% 100%" }}
+      aria-hidden
+    >
+      <path
+        d="M14 35s12-11.2 12-21A12 12 0 0 0 2 14c0 9.8 12 21 12 21Z"
+        fill={active ? "#3b82f6" : "#4f9dff"}
+        stroke="#0b0f14"
+        strokeWidth="1.5"
+      />
+      <circle cx="14" cy="14" r="4.5" fill="#0b0f14" />
+    </svg>
+  );
+}
+
+const CARD_EDGE_GAP = 8;
+
+function CafeHoverCard({ cafe, distanceKm }: { cafe: Cafe; distanceKm?: number }) {
+  const { t, locale } = useLocale();
+  const cover = cafe.images?.[0];
+  const district = cafe.district ? districtLabel(cafe.district, locale) : "";
+  const ref = useRef<HTMLAnchorElement>(null);
+  const [placement, setPlacement] = useState({ below: false, shiftX: 0 });
+
+  useLayoutEffect(() => {
+    const card = ref.current;
+    const frame = card?.closest("[data-cafes-map]");
+    if (!card || !frame) return;
+    const c = card.getBoundingClientRect();
+    const f = frame.getBoundingClientRect();
+    const below = c.top < f.top + CARD_EDGE_GAP;
+    let shiftX = 0;
+    if (c.left < f.left + CARD_EDGE_GAP) shiftX = f.left + CARD_EDGE_GAP - c.left;
+    else if (c.right > f.right - CARD_EDGE_GAP) shiftX = f.right - CARD_EDGE_GAP - c.right;
+    setPlacement({ below, shiftX });
+  }, []);
+
+  return (
+    <Link
+      ref={ref}
+      href={`/cafes/${cafe.slug}`}
+      onClick={(e) => e.stopPropagation()}
+      style={{ transform: `translateX(${placement.shiftX}px)` }}
+      className={cn(
+        "group absolute w-60 overflow-hidden rounded-xl border border-ink-700 bg-ink-900 text-left shadow-[0_16px_40px_rgba(0,0,0,0.5)]",
+        placement.below ? "top-full mt-2" : "bottom-full mb-2",
+      )}
+    >
+      <div className="relative h-24 bg-ink-800">
+        {cover ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={cover} alt="" className="h-full w-full object-cover" />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 to-transparent" />
+        <span className="absolute right-2 top-2 rounded-full bg-ink-950/80 px-2 py-0.5 text-xs font-semibold text-accent ring-1 ring-accent/30">
+          {formatMnt(cafe.pricePerHour)}
+          <span className="font-normal text-ink-300">{t("home.perHour")}</span>
+        </span>
+        <p className="absolute inset-x-3 bottom-2 truncate font-display text-sm font-semibold text-white">
+          {cafe.name}
+        </p>
+      </div>
+      <div className="space-y-2 p-3">
+        <div className="flex flex-wrap gap-1.5 text-[11px] text-ink-100">
+          <span className="inline-flex items-center gap-1 rounded-full bg-ink-800 px-2 py-0.5">
+            <Monitor className="h-3 w-3 text-accent" />
+            {t("home.pcs", { n: cafe.pcCount ?? 0 })}
+          </span>
+          {district ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-ink-800 px-2 py-0.5">
+              <MapPin className="h-3 w-3 text-accent" />
+              {district}
+            </span>
+          ) : null}
+          {typeof distanceKm === "number" ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-ink-800 px-2 py-0.5">
+              <Navigation className="h-3 w-3 text-accent" />
+              {t("map.distance", { n: distanceKm.toFixed(1) })}
+            </span>
+          ) : null}
+        </div>
+        <span className="inline-flex items-center gap-1 text-xs font-medium text-ink-100 group-hover:text-accent">
+          {t("home.details")}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </span>
+      </div>
+    </Link>
   );
 }
 
@@ -154,20 +227,18 @@ function FitToContent({
 
   useEffect(() => {
     if (!map) return;
+    const bounds = new google.maps.LatLngBounds();
+    points.forEach((p) => bounds.extend(p));
     if (center) {
-      const circle = new google.maps.Circle({ center, radius: radiusKm * 1000 });
-      const bounds = circle.getBounds();
-      if (bounds) map.fitBounds(bounds, 24);
-      return;
+      const circleBounds = new google.maps.Circle({ center, radius: radiusKm * 1000 }).getBounds();
+      if (circleBounds) bounds.union(circleBounds);
     }
-    if (points.length === 0) return;
-    if (points.length === 1) {
+    if (bounds.isEmpty()) return;
+    if (points.length === 1 && !center) {
       map.setCenter(points[0]!);
       map.setZoom(15);
       return;
     }
-    const bounds = new google.maps.LatLngBounds();
-    points.forEach((p) => bounds.extend(p));
     map.fitBounds(bounds, 48);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, key]);
