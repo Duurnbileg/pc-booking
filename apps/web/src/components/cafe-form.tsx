@@ -178,7 +178,7 @@ type TierFieldsProps = {
   onChange: (next: TierFormValues) => void;
   onRemove?: () => void;
   disabled?: boolean;
-  inputClass: string;
+  styles: FormStyles;
 };
 
 function TierFields({
@@ -187,18 +187,18 @@ function TierFields({
   onChange,
   onRemove,
   disabled,
-  inputClass,
+  styles: s,
 }: TierFieldsProps) {
   const { t } = useLocale();
-  const styles = TIER_STYLES[variant];
+  const inputClass = s.input;
 
   return (
-    <div className={cn("space-y-3 rounded-2xl border p-4 transition", styles.card)}>
+    <div className={cn("space-y-3 rounded-2xl border p-4 transition", s.tierCard[variant])}>
       <div className="flex items-center justify-between gap-3">
         <span
           className={cn(
             "inline-flex items-center gap-2 font-display text-lg font-semibold",
-            styles.title,
+            s.tierTitle[variant],
           )}
         >
           {variant === "vip" ? <Crown className="h-4 w-4" /> : null}
@@ -209,7 +209,10 @@ function TierFields({
             type="button"
             disabled={disabled}
             onClick={onRemove}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-ink-500 transition hover:bg-ink-800 hover:text-ink-100"
+            className={cn(
+              "flex h-7 w-7 items-center justify-center transition",
+              s.tierRemoveBtn,
+            )}
             aria-label={t("form.removeVip")}
           >
             <X className="h-4 w-4" />
@@ -219,7 +222,7 @@ function TierFields({
 
       <div className="grid gap-2 sm:grid-cols-2">
         <label className="block space-y-1.5">
-          <span className="text-xs text-ink-500">{t("form.pricePerHour")}</span>
+          <span className={cn("text-xs", s.muted)}>{t("form.pricePerHour")}</span>
           <input
             required
             disabled={disabled}
@@ -230,8 +233,8 @@ function TierFields({
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="inline-flex items-center gap-1.5 text-xs text-ink-500">
-            <Monitor className="h-3.5 w-3.5 text-ink-400" />
+          <span className={cn("inline-flex items-center gap-1.5 text-xs", s.muted)}>
+            <Monitor className="h-3.5 w-3.5" />
             {t("form.tierPcs")}
           </span>
           <input
@@ -247,7 +250,7 @@ function TierFields({
       <div className="grid gap-2 sm:grid-cols-2">
         {TIER_SPECS.map(({ key, icon: Icon, iconClass }) => (
           <label key={key} className="block space-y-1">
-            <span className="inline-flex items-center gap-1.5 text-xs text-ink-500">
+            <span className={cn("inline-flex items-center gap-1.5 text-xs", s.muted)}>
               <Icon className={cn("h-3.5 w-3.5", iconClass)} />
               {t(`form.${key}`)}
             </span>
@@ -269,10 +272,66 @@ type CafeFormProps = {
   value: CafeFormValues;
   onChange: (next: CafeFormValues) => void;
   disabled?: boolean;
+  variant?: "dark" | "light";
 };
 
-export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
+const FORM_STYLES = {
+  dark: {
+    input:
+      "w-full rounded-xl border border-ink-700 bg-ink-950/80 px-3 py-2.5 text-ink-100 disabled:opacity-60",
+    label: "text-sm font-medium text-ink-100",
+    muted: "text-ink-500",
+    badge: "rounded-full border border-ink-700 bg-ink-900/60 text-ink-100",
+    tierCard: {
+      hall: TIER_STYLES.hall.card,
+      vip: TIER_STYLES.vip.card,
+    },
+    tierTitle: {
+      hall: TIER_STYLES.hall.title,
+      vip: TIER_STYLES.vip.title,
+    },
+    tierRemoveBtn: "rounded-full text-ink-500 hover:bg-ink-800 hover:text-ink-100",
+    addVipBtn:
+      "rounded-2xl border border-dashed border-ink-700 text-ink-500 hover:border-status-inuse/60 hover:text-status-inuse",
+    thumb: "rounded-xl border border-ink-700 bg-ink-950",
+    removeBtn: "bg-ink-950/90 text-ink-100",
+    dropzone:
+      "rounded-xl border border-dashed border-ink-700 text-ink-500 hover:border-accent hover:text-accent",
+  },
+  light: {
+    input:
+      "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200 disabled:bg-slate-50 disabled:opacity-60",
+    label: "text-sm font-medium text-slate-700",
+    muted: "text-slate-500",
+    badge: "rounded-full border border-slate-200 bg-slate-50 text-slate-700",
+    tierCard: {
+      hall: "border-slate-200 bg-slate-50/60",
+      vip: "border-amber-200 bg-amber-50/60",
+    },
+    tierTitle: {
+      hall: "text-emerald-700",
+      vip: "text-amber-700",
+    },
+    tierRemoveBtn: "rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700",
+    addVipBtn:
+      "rounded-lg border border-dashed border-slate-300 bg-slate-50/60 text-slate-500 hover:border-amber-400 hover:text-amber-700",
+    thumb: "rounded-lg border border-slate-200 bg-slate-100",
+    removeBtn: "bg-white/90 text-slate-700 shadow-sm hover:bg-white",
+    dropzone:
+      "rounded-lg border border-dashed border-slate-300 bg-slate-50/60 text-slate-500 hover:border-slate-400 hover:text-slate-700",
+  },
+} as const;
+
+type FormStyles = (typeof FORM_STYLES)[keyof typeof FORM_STYLES];
+
+export function CafeFormFields({
+  value,
+  onChange,
+  disabled,
+  variant = "dark",
+}: CafeFormProps) {
   const { t, locale } = useLocale();
+  const s = FORM_STYLES[variant];
 
   const previewItems = useMemo(
     () => [
@@ -323,14 +382,13 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
   const totalPcs =
     (parsePcs(value.hall.pcs) || 0) + (value.hasVip ? parsePcs(value.vip.pcs) || 0 : 0);
 
-  const inputClass =
-    "w-full rounded-xl border border-ink-700 bg-ink-950/80 px-3 py-2.5 text-ink-100 disabled:opacity-60";
+  const inputClass = s.input;
 
   return (
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">{t("form.cafeName")}</span>
+          <span className={s.label}>{t("form.cafeName")}</span>
           <input
             required
             disabled={disabled}
@@ -340,7 +398,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">{t("form.phone")}</span>
+          <span className={s.label}>{t("form.phone")}</span>
           <input
             required
             disabled={disabled}
@@ -353,7 +411,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
 
       <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">{t("form.address")}</span>
+          <span className={s.label}>{t("form.address")}</span>
           <input
             required
             disabled={disabled}
@@ -363,7 +421,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="text-sm font-medium text-ink-100">{t("form.district")}</span>
+          <span className={s.label}>{t("form.district")}</span>
           <select
             disabled={disabled}
             value={value.district}
@@ -381,10 +439,11 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <span className="text-sm font-medium text-ink-100">{t("map.location")}</span>
+        <span className={s.label}>{t("map.location")}</span>
         <LocationPicker
           value={value.location}
           disabled={disabled}
+          variant={variant}
           onChange={(location, address) =>
             onChange({
               ...value,
@@ -396,7 +455,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
       </div>
 
       <label className="block space-y-1.5">
-        <span className="text-sm font-medium text-ink-100">{t("form.description")}</span>
+        <span className={s.label}>{t("form.description")}</span>
         <textarea
           disabled={disabled}
           rows={2}
@@ -407,7 +466,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
       </label>
 
       <label className="block space-y-1.5">
-        <span className="text-sm font-medium text-ink-100">{t("form.gear")}</span>
+        <span className={s.label}>{t("form.gear")}</span>
         <textarea
           disabled={disabled}
           rows={3}
@@ -421,10 +480,15 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
       <section className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="space-y-0.5">
-            <span className="text-sm font-medium text-ink-100">{t("form.pricing")}</span>
-            <p className="text-xs text-ink-500">{t("form.pricingHint")}</p>
+            <span className={s.label}>{t("form.pricing")}</span>
+            <p className={cn("text-xs", s.muted)}>{t("form.pricingHint")}</p>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-700 bg-ink-900/60 px-3 py-1 text-sm font-medium text-ink-100">
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium",
+              s.badge,
+            )}
+          >
             <Monitor className="h-3.5 w-3.5 text-accent" />
             {t("form.totalPcs", { n: totalPcs })}
           </span>
@@ -436,7 +500,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
             value={value.hall}
             onChange={(hall) => set("hall", hall)}
             disabled={disabled}
-            inputClass={inputClass}
+            styles={s}
           />
           {value.hasVip ? (
             <TierFields
@@ -445,14 +509,17 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
               onChange={(vip) => set("vip", vip)}
               onRemove={() => set("hasVip", false)}
               disabled={disabled}
-              inputClass={inputClass}
+              styles={s}
             />
           ) : (
             <button
               type="button"
               disabled={disabled}
               onClick={() => set("hasVip", true)}
-              className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-ink-700 py-5 text-sm text-ink-500 transition hover:border-status-inuse/60 hover:text-status-inuse disabled:opacity-60"
+              className={cn(
+                "flex items-center justify-center gap-2 py-5 text-sm transition disabled:opacity-60",
+                s.addVipBtn,
+              )}
             >
               <Crown className="h-4 w-4" />
               + {t("form.hasVip")}
@@ -462,7 +529,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
       </section>
 
       <div className="space-y-3">
-        <span className="text-sm font-medium text-ink-100">{t("form.images")}</span>
+        <span className={s.label}>{t("form.images")}</span>
         <label className="block cursor-pointer">
           <input
             type="file"
@@ -480,7 +547,7 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
               {previewItems.map((item) => (
                 <div
                   key={item.key}
-                  className="relative aspect-[4/3] overflow-hidden rounded-xl border border-ink-700 bg-ink-950"
+                  className={cn("relative aspect-[4/3] overflow-hidden", s.thumb)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -496,19 +563,29 @@ export function CafeFormFields({ value, onChange, disabled }: CafeFormProps) {
                       e.stopPropagation();
                       removePreview(item.key, item.kind);
                     }}
-                    className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-ink-950/90 text-ink-100"
+                    className={cn(
+                      "absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full",
+                      s.removeBtn,
+                    )}
                     aria-label={t("form.removeImage")}
                   >
                     ×
                   </button>
                 </div>
               ))}
-              <div className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-ink-700 text-sm text-ink-500 hover:border-accent hover:text-accent">
+              <div
+                className={cn(
+                  "flex aspect-[4/3] items-center justify-center text-sm",
+                  s.dropzone,
+                )}
+              >
                 {t("form.addMore")}
               </div>
             </div>
           ) : (
-            <div className="rounded-xl border border-dashed border-ink-700 px-4 py-10 text-center text-sm text-ink-500 transition hover:border-accent hover:text-accent">
+            <div
+              className={cn("px-4 py-10 text-center text-sm transition", s.dropzone)}
+            >
               {t("form.uploadHint")}
             </div>
           )}

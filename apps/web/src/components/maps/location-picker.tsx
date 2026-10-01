@@ -10,6 +10,7 @@ import {
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
 import { useT } from "@/components/locale-provider";
+import { cn } from "@/lib/utils";
 import {
   GOOGLE_MAPS_API_KEY,
   GOOGLE_MAPS_MAP_ID,
@@ -25,10 +26,17 @@ type LocationPickerProps = {
   value: LatLng | null;
   onChange: (location: LatLng, address?: string) => void;
   disabled?: boolean;
+  variant?: "dark" | "light";
 };
 
-export function LocationPicker({ value, onChange, disabled }: LocationPickerProps) {
+export function LocationPicker({
+  value,
+  onChange,
+  disabled,
+  variant = "dark",
+}: LocationPickerProps) {
   const t = useT();
+  const light = variant === "light";
   const [locating, setLocating] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
 
@@ -54,10 +62,13 @@ export function LocationPicker({ value, onChange, disabled }: LocationPickerProp
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-ink-500">{t("map.pickHint")}</p>
+      <p className={cn("text-xs", light ? "text-slate-500" : "text-ink-500")}>
+        {t("map.pickHint")}
+      </p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <PlaceSearch
           disabled={disabled}
+          light={light}
           placeholder={t("map.searchAddress")}
           onSelect={(location, address) => onChange(location, address)}
         />
@@ -65,20 +76,34 @@ export function LocationPicker({ value, onChange, disabled }: LocationPickerProp
           type="button"
           disabled={disabled || locating}
           onClick={locateMe}
-          className="shrink-0 rounded-xl border border-ink-700 px-3 py-2.5 text-sm text-ink-100 transition hover:border-accent hover:text-accent disabled:opacity-60"
+          className={cn(
+            "shrink-0 rounded-xl border px-3 py-2.5 text-sm transition disabled:opacity-60",
+            light
+              ? "rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              : "border-ink-700 text-ink-100 hover:border-accent hover:text-accent",
+          )}
         >
           {locating ? t("map.locating") : t("map.useMyLocation")}
         </button>
       </div>
-      {geoError ? <p className="text-sm text-status-reserved">{geoError}</p> : null}
+      {geoError ? (
+        <p className={cn("text-sm", light ? "text-red-600" : "text-status-reserved")}>
+          {geoError}
+        </p>
+      ) : null}
 
-      <div className="h-72 overflow-hidden rounded-xl border border-ink-700">
+      <div
+        className={cn(
+          "h-72 overflow-hidden border",
+          light ? "rounded-lg border-slate-200" : "rounded-xl border-ink-700",
+        )}
+      >
         <Map
           id={MAP_ID}
           mapId={GOOGLE_MAPS_MAP_ID}
           defaultCenter={value ?? UB_CENTER}
           defaultZoom={value ? 16 : 12}
-          colorScheme={ColorScheme.DARK}
+          colorScheme={light ? ColorScheme.LIGHT : ColorScheme.DARK}
           gestureHandling="greedy"
           disableDefaultUI
           zoomControl
@@ -103,7 +128,7 @@ export function LocationPicker({ value, onChange, disabled }: LocationPickerProp
           ) : null}
         </Map>
       </div>
-      <p className="text-xs text-ink-500">
+      <p className={cn("text-xs", light ? "text-slate-500" : "text-ink-500")}>
         {value
           ? `${value.lat.toFixed(6)}, ${value.lng.toFixed(6)}`
           : t("map.noLocation")}
@@ -126,10 +151,12 @@ function PlaceSearch({
   onSelect,
   placeholder,
   disabled,
+  light,
 }: {
   onSelect: (location: LatLng, address: string) => void;
   placeholder: string;
   disabled?: boolean;
+  light?: boolean;
 }) {
   const places = useMapsLibrary("places");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -145,7 +172,7 @@ function PlaceSearch({
       includedRegionCodes: ["mn"],
       locationBias: UB_CENTER,
     });
-    element.style.colorScheme = "dark";
+    element.style.colorScheme = light ? "light" : "dark";
     element.style.width = "100%";
     container.appendChild(element);
     elementRef.current = element;
@@ -168,7 +195,7 @@ function PlaceSearch({
       element.remove();
       elementRef.current = null;
     };
-  }, [places]);
+  }, [places, light]);
 
   useEffect(() => {
     if (!elementRef.current) return;

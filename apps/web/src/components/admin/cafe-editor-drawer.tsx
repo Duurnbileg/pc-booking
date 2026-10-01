@@ -75,7 +75,6 @@ export function CafeEditorDrawer({
       width="lg"
       title={cafe ? t("dash.editTitle") : t("dash.createTitle")}
       onClose={close}
-      bodyClassName="bg-ink-900 text-ink-100"
       footer={
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-sm text-red-600">{error}</p>
@@ -110,7 +109,12 @@ export function CafeEditorDrawer({
           save.mutate();
         }}
       >
-        <CafeFormFields value={form} onChange={setForm} disabled={save.isPending} />
+        <CafeFormFields
+          value={form}
+          onChange={setForm}
+          disabled={save.isPending}
+          variant="light"
+        />
       </form>
     </Drawer>
   );
