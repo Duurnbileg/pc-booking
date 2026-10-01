@@ -2,6 +2,8 @@
 
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { SearchFilterPanel } from "@/components/search-filter-panel";
 import { DatePicker } from "@/components/date-picker";
@@ -32,6 +34,8 @@ export function SearchBar({ initial }: SearchBarProps) {
   const router = useRouter();
   const [draft, setDraft] = useState<CafeSearch>(() => initial ?? emptySearch());
   const [panelOpen, setPanelOpen] = useState(false);
+  /** Mobile only: the bar starts as a compact pill. */
+  const [expanded, setExpanded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const closePanel = useCallback(() => setPanelOpen(false), []);
 
@@ -44,6 +48,7 @@ export function SearchBar({ initial }: SearchBarProps) {
 
   function submit() {
     setPanelOpen(false);
+    setExpanded(false);
     router.push(`/search?${searchToParams(draft).toString()}`);
   }
 
@@ -51,38 +56,78 @@ export function SearchBar({ initial }: SearchBarProps) {
 
   return (
     <div ref={containerRef} className="relative">
+      {!expanded ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="flex w-full items-center gap-3 rounded-full border border-ink-700 bg-ink-900/90 px-4 py-2.5 text-left shadow-lg shadow-black/20 sm:hidden"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-ink-950">
+            <SearchIcon />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium text-ink-100">
+              {draft.q || t("home.searchPlaceholder")}
+            </span>
+            <span className="block truncate text-xs text-ink-500">
+              {draft.date.replaceAll("-", ".")} · {t("search.peopleCount", { n: draft.people })}
+              {count > 0 ? ` · ${t("search.selectedCount", { n: count })}` : ""}
+            </span>
+          </span>
+        </button>
+      ) : null}
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
           submit();
         }}
-        className="flex flex-col gap-2 rounded-2xl border border-ink-700 bg-ink-900/80 p-2 lg:flex-row lg:items-stretch lg:gap-0"
+        className={cn(
+          "flex-col rounded-3xl border border-ink-700 bg-ink-900/90 p-1.5 shadow-lg shadow-black/20 sm:flex sm:flex-row sm:items-center sm:rounded-full",
+          expanded ? "flex" : "hidden",
+        )}
       >
-        <label className="flex flex-1 items-center gap-2 rounded-xl px-3 py-2 focus-within:bg-ink-800/70">
-          <SearchIcon />
-          <input
-            value={draft.q}
-            onChange={(e) => setDraft({ ...draft, q: e.target.value })}
-            onFocus={() => setPanelOpen(true)}
-            onClick={() => setPanelOpen(true)}
-            placeholder={t("home.searchPlaceholder")}
-            className="min-w-0 flex-1 bg-transparent py-1.5 text-ink-100 placeholder:text-ink-500 focus:outline-none"
-          />
-          {hasFilters(draft) ? (
-            <button
-              type="button"
+        <div className="flex items-center justify-between px-4 pb-1 pt-2 sm:hidden">
+          <span className="text-sm font-semibold text-ink-100">{t("home.search")}</span>
+          <button
+            type="button"
+            onClick={() => {
+              setExpanded(false);
+              setPanelOpen(false);
+            }}
+            aria-label={t("search.collapse")}
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-ink-700 text-ink-300 transition hover:text-ink-100"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <label className="flex min-w-0 flex-[1.4] cursor-text flex-col rounded-2xl px-4 py-2 sm:rounded-full sm:px-5 transition hover:bg-ink-800/70 focus-within:bg-ink-800/70">
+          <span className="text-xs font-semibold text-ink-100">{t("search.where")}</span>
+          <span className="flex items-center gap-2">
+            <input
+              value={draft.q}
+              onChange={(e) => setDraft({ ...draft, q: e.target.value })}
+              onFocus={() => setPanelOpen(true)}
               onClick={() => setPanelOpen(true)}
-              className="shrink-0 rounded-full bg-accent/15 px-2.5 py-1 text-xs font-medium text-accent"
-            >
-              {t("search.selectedCount", { n: count })}
-            </button>
-          ) : null}
+              placeholder={t("home.searchPlaceholder")}
+              className="min-w-0 flex-1 bg-transparent py-0.5 text-sm text-ink-100 placeholder:text-ink-500 focus:outline-none"
+            />
+            {hasFilters(draft) ? (
+              <button
+                type="button"
+                onClick={() => setPanelOpen(true)}
+                className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent"
+              >
+                {t("search.selectedCount", { n: count })}
+              </button>
+            ) : null}
+          </span>
         </label>
 
         <Divider />
 
-        <div className="flex items-center gap-2 rounded-xl px-3 py-2 focus-within:bg-ink-800/70">
-          <span className="text-xs text-ink-500">{t("search.date")}</span>
+        <div className="flex flex-col rounded-2xl px-4 py-2 sm:rounded-full sm:px-5 transition hover:bg-ink-800/70 [&_button]:py-0">
+          <span className="text-xs font-semibold text-ink-100">{t("search.date")}</span>
           <DatePicker
             value={draft.date}
             min={todayIso()}
@@ -93,8 +138,8 @@ export function SearchBar({ initial }: SearchBarProps) {
 
         <Divider />
 
-        <div className="flex items-center gap-3 rounded-xl px-3 py-2">
-          <span className="text-xs text-ink-500">{t("search.people")}</span>
+        <div className="flex flex-col rounded-2xl px-4 py-2 sm:rounded-full sm:px-5 transition hover:bg-ink-800/70">
+          <span className="text-xs font-semibold text-ink-100">{t("search.people")}</span>
           <div className="flex items-center gap-2">
             <StepperButton
               label={t("search.decrease")}
@@ -103,7 +148,7 @@ export function SearchBar({ initial }: SearchBarProps) {
             >
               −
             </StepperButton>
-            <span className="min-w-[3.5rem] text-center text-sm font-medium text-ink-100">
+            <span className="min-w-[3rem] text-center text-sm font-medium text-ink-100">
               {t("search.peopleCount", { n: draft.people })}
             </span>
             <StepperButton
@@ -118,9 +163,11 @@ export function SearchBar({ initial }: SearchBarProps) {
 
         <button
           type="submit"
-          className="rounded-xl bg-accent px-6 py-3 font-medium text-ink-950 transition hover:bg-accent-dim lg:ml-2"
+          aria-label={t("home.search")}
+          className="mt-1.5 flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-5 font-medium text-ink-950 transition hover:bg-accent-dim sm:ml-1 sm:mt-0 sm:w-12 sm:px-0"
         >
-          {t("home.search")}
+          <SearchIcon />
+          <span className="sm:hidden">{t("home.search")}</span>
         </button>
       </form>
 
@@ -136,7 +183,7 @@ export function SearchBar({ initial }: SearchBarProps) {
 }
 
 function Divider() {
-  return <span className="hidden w-px self-stretch bg-ink-700 lg:my-2 lg:block" />;
+  return <span className="hidden h-8 w-px shrink-0 bg-ink-700 sm:block" />;
 }
 
 function StepperButton({
@@ -156,7 +203,7 @@ function StepperButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex h-7 w-7 items-center justify-center rounded-full border border-ink-700 text-ink-100 transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink-700 disabled:hover:text-ink-100"
+      className="flex h-6 w-6 items-center justify-center rounded-full border border-ink-700 text-ink-100 transition hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink-700 disabled:hover:text-ink-100"
     >
       {children}
     </button>
@@ -168,7 +215,7 @@ function SearchIcon() {
     <svg
       aria-hidden
       viewBox="0 0 24 24"
-      className="h-5 w-5 shrink-0 text-ink-500"
+      className="h-5 w-5 shrink-0"
       fill="none"
       stroke="currentColor"
       strokeWidth={2}

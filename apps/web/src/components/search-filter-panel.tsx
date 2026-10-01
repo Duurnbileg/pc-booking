@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, type ReactNode, type RefObject } from "react";
-import {
-  DISTRICTS,
-  GPU_OPTIONS,
-  MONITOR_HZ_OPTIONS,
-  PRICE_RANGES,
-} from "@pc-booking/shared";
+import { useEffect, useMemo, useState, type ReactNode, type RefObject } from "react";
+import { ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { API_PATHS, DISTRICTS, PRICE_RANGES } from "@pc-booking/shared";
+import { api } from "@/lib/api";
+import type { Cafe } from "@/lib/types";
 import { useLocale } from "@/components/locale-provider";
-import { priceRangeOf, toggle, withPriceRange, type CafeSearch } from "@/lib/search";
+import {
+  priceRangeOf,
+  specTagsFrom,
+  toggle,
+  withPriceRange,
+  type CafeSearch,
+} from "@/lib/search";
 import { cn } from "@/lib/utils";
 
 type SearchFilterPanelProps = {
@@ -29,6 +34,12 @@ export function SearchFilterPanel({
   containerRef,
 }: SearchFilterPanelProps) {
   const { t, locale } = useLocale();
+  const allCafes = useQuery({
+    queryKey: ["cafes"],
+    queryFn: () => api<{ cafes: Cafe[] }>(API_PATHS.cafes.list),
+    enabled: open,
+  });
+  const tags = useMemo(() => specTagsFrom(allCafes.data?.cafes ?? []), [allCafes.data]);
 
   useEffect(() => {
     if (!open) return;
@@ -51,8 +62,8 @@ export function SearchFilterPanel({
   const priceRange = priceRangeOf(value);
 
   return (
-    <div className="absolute left-0 right-0 top-full z-30 mt-2 space-y-6 rounded-2xl border border-ink-700 bg-ink-900 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
-      <FilterSection title={t("search.district")}>
+    <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-[65vh] space-y-4 overflow-y-auto rounded-2xl border border-ink-700 bg-ink-900 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.45)] sm:max-h-none sm:space-y-6 sm:overflow-visible sm:p-5">
+      <FilterSection title={t("search.district")} count={value.districts.length}>
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-5">
           {DISTRICTS.map((d) => (
             <OptionButton
@@ -66,7 +77,7 @@ export function SearchFilterPanel({
         </div>
       </FilterSection>
 
-      <FilterSection title={t("search.price")}>
+      <FilterSection title={t("search.price")} count={priceRange ? 1 : 0}>
         <div className="flex flex-wrap gap-2">
           {PRICE_RANGES.map((r) => (
             <Chip
@@ -82,10 +93,10 @@ export function SearchFilterPanel({
         </div>
       </FilterSection>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <FilterSection title={t("search.gpu")}>
+      <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+        <FilterSection title={t("search.gpu")} count={value.gpus.length}>
           <div className="flex flex-wrap gap-2">
-            {GPU_OPTIONS.map((gpu) => (
+            {tags.gpus.map((gpu) => (
               <Chip
                 key={gpu}
                 active={value.gpus.includes(gpu)}
@@ -97,9 +108,9 @@ export function SearchFilterPanel({
           </div>
         </FilterSection>
 
-        <FilterSection title={t("search.hz")}>
+        <FilterSection title={t("search.hz")} count={value.hz.length}>
           <div className="flex flex-wrap gap-2">
-            {MONITOR_HZ_OPTIONS.map((hz) => (
+            {tags.hz.map((hz) => (
               <Chip
                 key={hz}
                 active={value.hz.includes(hz)}
@@ -115,11 +126,38 @@ export function SearchFilterPanel({
   );
 }
 
-function FilterSection({ title, children }: { title: string; children: ReactNode }) {
+/** Collapsible on mobile; always expanded from `sm` up. */
+function FilterSection({
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count: number;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="space-y-3">
-      <p className="text-sm font-semibold text-ink-100">{title}</p>
-      {children}
+    <div className="border-b border-ink-800 pb-4 last:border-0 last:pb-0 sm:space-y-3 sm:border-0 sm:pb-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between text-left sm:pointer-events-none"
+      >
+        <span className="flex items-center gap-2 text-sm font-semibold text-ink-100">
+          {title}
+          {count > 0 ? (
+            <span className="rounded-full bg-accent/15 px-1.5 text-xs font-medium text-accent">
+              {count}
+            </span>
+          ) : null}
+        </span>
+        <ChevronDown
+          className={cn("h-4 w-4 text-ink-500 transition-transform sm:hidden", open && "rotate-180")}
+        />
+      </button>
+      <div className={cn("mt-3 sm:mt-0 sm:block", open ? "block" : "hidden")}>{children}</div>
     </div>
   );
 }

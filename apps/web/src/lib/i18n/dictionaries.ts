@@ -36,16 +36,15 @@ const mn = {
     full: "Дүүрсэн",
     scrollLeft: "Өмнөх",
     scrollRight: "Дараах",
-    howTitle: "Хэрхэн ажилладаг вэ",
-    step1Title: "Хай",
-    step1Body: "Байршил, GPU, дэлгэцийн Hz-ээр шүүж өөрт тохирох Gaming Center-ээ ол.",
-    step2Title: "Харьцуул",
-    step2Body: "Үнэ, gear, PC-ийн үзүүлэлтийг нэг дороос харьцуул.",
-    step3Title: "Оч, тогло",
-    step3Body: "Газрын зургаас байршлыг нь хараад очиж тоглоорой.",
     ctaTitle: "Gaming Center эзэмшдэг үү?",
     ctaBody: "Gaming Center-ээ PickPC-д бүртгүүлж, тоглогчдод өөрсдийгөө таниулаарай.",
     ctaButton: "Gaming Center бүртгүүлэх",
+  },
+  footer: {
+    tagline: "Улаанбаатарын Gaming Center-үүдийг нэг дороос.",
+    browse: "Gaming Center хайх",
+    listCafe: "Gaming Center бүртгүүлэх",
+    copyright: "© {year} PickPC. Бүх эрх хуулиар хамгаалагдсан.",
   },
   search: {
     title: "Хайлтын үр дүн",
@@ -54,6 +53,9 @@ const mn = {
     decrease: "Хасах",
     increase: "Нэмэх",
     date: "Хэзээ",
+    where: "Хаана",
+    collapse: "Хураах",
+    showResults: "{n} үр дүнг харах",
     today: "Өнөөдөр",
     prevMonth: "Өмнөх сар",
     nextMonth: "Дараах сар",
@@ -384,16 +386,15 @@ const en: DictShape = {
     full: "Full",
     scrollLeft: "Previous",
     scrollRight: "Next",
-    howTitle: "How it works",
-    step1Title: "Search",
-    step1Body: "Filter by location, GPU, and refresh rate to find the right gaming center.",
-    step2Title: "Compare",
-    step2Body: "Compare prices, gear, and PC specs in one place.",
-    step3Title: "Show up and play",
-    step3Body: "Find it on the map, head over, and play.",
     ctaTitle: "Own a gaming center?",
     ctaBody: "List your gaming center on PickPC and introduce yourself to gamers.",
     ctaButton: "List your gaming center",
+  },
+  footer: {
+    tagline: "Every gaming center in Ulaanbaatar, in one place.",
+    browse: "Browse gaming centers",
+    listCafe: "List your gaming center",
+    copyright: "© {year} PickPC. All rights reserved.",
   },
   search: {
     title: "Search results",
@@ -402,6 +403,9 @@ const en: DictShape = {
     decrease: "Decrease",
     increase: "Increase",
     date: "When",
+    where: "Where",
+    collapse: "Collapse",
+    showResults: "Show {n} results",
     today: "Today",
     prevMonth: "Previous month",
     nextMonth: "Next month",
@@ -696,6 +700,7 @@ export const dictionaries: Record<Locale, DictShape> = { mn, en };
 export type TranslationKey =
   | `nav.${keyof typeof mn.nav}`
   | `home.${keyof typeof mn.home}`
+  | `footer.${keyof typeof mn.footer}`
   | `search.${keyof typeof mn.search}`
   | `seat.${keyof typeof mn.seat}`
   | `auth.${keyof typeof mn.auth}`

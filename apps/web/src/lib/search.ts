@@ -1,8 +1,6 @@
 import {
   CAFE_SORTS,
   DISTRICT_IDS,
-  GPU_OPTIONS,
-  MONITOR_HZ_OPTIONS,
   PRICE_RANGES,
   type CafeSort,
   type District,
@@ -96,12 +94,39 @@ export function searchToParams(search: CafeSearch): URLSearchParams {
 function listParam<T extends string>(
   params: URLSearchParams,
   key: string,
-  allowed: readonly T[],
+  allowed: readonly T[] | RegExp,
 ): T[] {
   return (params.get(key) ?? "")
     .split(",")
     .map((s) => s.trim())
-    .filter((s): s is T => (allowed as readonly string[]).includes(s));
+    .filter((s): s is T =>
+      allowed instanceof RegExp ? allowed.test(s) : (allowed as readonly string[]).includes(s),
+    );
+}
+
+const GPU_TAG = /^(?:RTX|GTX) \d{4}$/;
+const HZ_TAG = /^\d{2,3}Hz$/;
+
+/** Mirrors the API's specPattern: tags match the free-text displaySpecs on their number. */
+export function specMatches(specs: string, tag: string): boolean {
+  const number = tag.match(/\d+/)?.[0];
+  if (!number) return specs.toLowerCase().includes(tag.toLowerCase());
+  return new RegExp(`(?<!\\d)${number}(?!\\d)`).test(specs);
+}
+
+/** GPU ("RTX 5070") and refresh-rate ("400Hz") tags that actually appear in the cafes' specs, highest first. */
+export function specTagsFrom(cafes: { displaySpecs: string }[]): { gpus: string[]; hz: string[] } {
+  const gpus = new Set<string>();
+  const hz = new Set<string>();
+  for (const { displaySpecs } of cafes) {
+    for (const m of displaySpecs.matchAll(/\b(RTX|GTX)\s?(\d{4})/gi)) {
+      gpus.add(`${m[1]!.toUpperCase()} ${m[2]}`);
+    }
+    for (const m of displaySpecs.matchAll(/(?<!\d)(\d{2,3})\s?hz/gi)) hz.add(`${m[1]}Hz`);
+  }
+  const byNumberDesc = (a: string, b: string) =>
+    Number(b.match(/\d+/)?.[0]) - Number(a.match(/\d+/)?.[0]);
+  return { gpus: [...gpus].sort(byNumberDesc), hz: [...hz].sort(byNumberDesc) };
 }
 
 function numberParam(params: URLSearchParams, key: string): number | undefined {
@@ -120,8 +145,8 @@ export function parseSearch(params: URLSearchParams): CafeSearch {
     districts: listParam(params, "district", DISTRICT_IDS),
     minPrice: numberParam(params, "minPrice"),
     maxPrice: numberParam(params, "maxPrice"),
-    gpus: listParam(params, "gpu", GPU_OPTIONS),
-    hz: listParam(params, "hz", MONITOR_HZ_OPTIONS),
+    gpus: listParam(params, "gpu", GPU_TAG),
+    hz: listParam(params, "hz", HZ_TAG),
     people: Math.min(Math.max(people, 1), MAX_PEOPLE),
     date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : todayIso(),
     sort: sort && CAFE_SORTS.includes(sort) ? sort : "newest",
