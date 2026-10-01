@@ -14,6 +14,7 @@ import {
   MapUnavailable,
   UB_CENTER,
   cafeLatLng,
+  haversineKm,
   type LatLng,
 } from "@/components/maps/maps-provider";
 
@@ -22,19 +23,10 @@ const MAP_ID = "cafes-map";
 type CafesMapProps = {
   cafes: Cafe[];
   center: LatLng | null;
-  radiusKm: number;
+  /** Draws a search-radius circle around `center` when set. */
+  radiusKm?: number;
   className?: string;
 };
-
-function haversineKm(a: LatLng, b: LatLng): number {
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return 6371 * 2 * Math.asin(Math.sqrt(h));
-}
 
 export function CafesMap({ cafes, center, radiusKm, className }: CafesMapProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -81,16 +73,18 @@ export function CafesMap({ cafes, center, radiusKm, className }: CafesMapProps) 
             <AdvancedMarker position={center} zIndex={500}>
               <div className="h-4 w-4 rounded-full border-2 border-white bg-sky-500 shadow-[0_0_0_6px_rgba(14,165,233,0.25)]" />
             </AdvancedMarker>
-            <Circle
-              center={center}
-              radius={radiusKm * 1000}
-              strokeColor="#0ea5e9"
-              strokeOpacity={0.8}
-              strokeWeight={2}
-              fillColor="#0ea5e9"
-              fillOpacity={0.08}
-              clickable={false}
-            />
+            {radiusKm ? (
+              <Circle
+                center={center}
+                radius={radiusKm * 1000}
+                strokeColor="#0ea5e9"
+                strokeOpacity={0.8}
+                strokeWeight={2}
+                fillColor="#0ea5e9"
+                fillOpacity={0.08}
+                clickable={false}
+              />
+            ) : null}
           </>
         ) : null}
 
@@ -222,7 +216,7 @@ function FitToContent({
 }: {
   points: LatLng[];
   center: LatLng | null;
-  radiusKm: number;
+  radiusKm?: number;
 }) {
   const map = useMap(MAP_ID);
   const key = JSON.stringify({ points, center, radiusKm });
@@ -231,9 +225,11 @@ function FitToContent({
     if (!map) return;
     const bounds = new google.maps.LatLngBounds();
     points.forEach((p) => bounds.extend(p));
-    if (center) {
+    if (center && radiusKm) {
       const circleBounds = new google.maps.Circle({ center, radius: radiusKm * 1000 }).getBounds();
       if (circleBounds) bounds.union(circleBounds);
+    } else if (center) {
+      bounds.extend(center);
     }
     if (bounds.isEmpty()) return;
     if (points.length === 1 && !center) {

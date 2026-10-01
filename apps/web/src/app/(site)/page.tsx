@@ -1,27 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
 import { useAuth } from "@/components/auth-provider";
 import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
-import { CafeGridSkeleton } from "@/components/skeletons";
 import { CafesMap } from "@/components/maps/cafes-map";
-import { CafeCard } from "@/components/home/cafe-card";
-import { HowItWorks, OwnerCta, StatsStrip } from "@/components/home/home-sections";
+import { CafeRow } from "@/components/home/cafe-row";
+import { HowItWorks, OwnerCta } from "@/components/home/home-sections";
 import {
   getCurrentPosition,
   type LatLng,
 } from "@/components/maps/maps-provider";
 
-const NEARBY_RADIUS_KM = 1;
-const NEARBY_LIMIT = 6;
+/** The API's maximum radius — the row just lists the closest cafes, nearest first. */
+const NEARBY_RADIUS_KM = 50;
+const ROW_LIMIT = 10;
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -71,87 +69,69 @@ function HomeContent() {
         lat: String(center!.lat),
         lng: String(center!.lng),
         radiusKm: String(NEARBY_RADIUS_KM),
-        limit: String(NEARBY_LIMIT),
+        limit: String(ROW_LIMIT),
       });
       return api<{ cafes: Cafe[] }>(`${API_PATHS.cafes.list}?${params}`);
     },
     enabled: center !== null,
   });
 
-  const cafes = nearby.data?.cafes ?? [];
-  const loadingNearby = locating || nearby.isLoading;
+  const cheapest = useQuery({
+    queryKey: ["cafes", "cheapest"],
+    queryFn: () => {
+      const params = new URLSearchParams({ sort: "price_asc", limit: String(ROW_LIMIT) });
+      return api<{ cafes: Cafe[] }>(`${API_PATHS.cafes.list}?${params}`);
+    },
+  });
 
   return (
     <div className="space-y-14">
-      <section className="relative z-10 -mx-4 -mt-8 px-4 pb-4 pt-14 sm:pt-20">
+      <section className="relative z-10 -mx-4 -mt-8 px-4 pb-2 pt-8 sm:pt-10">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="bg-grid absolute inset-0" />
-          <div className="absolute left-1/2 top-0 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
+          <div className="absolute left-1/2 top-0 h-48 w-[42rem] -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
         </div>
 
-        <div className="mx-auto max-w-5xl space-y-6 text-center">
-          <h1 className="text-balance bg-gradient-to-r from-accent via-sky-300 to-indigo-300 bg-clip-text pb-2 font-display text-5xl font-bold leading-tight tracking-tight text-transparent sm:text-7xl">
-            {t("home.heroTitle")}
-          </h1>
-          <p className="mx-auto max-w-2xl text-lg text-ink-300 sm:text-xl">{t("home.tagline")}</p>
-        </div>
-
-        <div className="mx-auto mt-8 max-w-4xl">
+        <h1 className="sr-only">{t("home.heroTitle")}</h1>
+        <div className="mx-auto max-w-4xl">
           <SearchBar />
         </div>
       </section>
 
-      <StatsStrip cafes={allCafes.data?.cafes ?? []} loading={allCafes.isLoading} />
+      <div className="space-y-10">
+        <CafeRow
+          title={t("map.nearResults")}
+          href="/search"
+          cafes={nearby.data?.cafes ?? []}
+          loading={!geoError && (locating || nearby.isLoading)}
+          origin={center}
+          emptyMessage={
+            geoError === "unsupported"
+              ? t("map.geoUnsupported")
+              : geoError
+                ? t("map.needLocation")
+                : nearby.error
+                  ? t("home.loadError")
+                  : nearby.data?.cafes.length === 0
+                    ? t("map.nearEmpty")
+                    : null
+          }
+        />
 
-      <section className="space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-2xl text-ink-100">
-            {t("map.nearResults", { r: NEARBY_RADIUS_KM })}
-          </h2>
-          <Link
-            href="/search"
-            className="group inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent hover:text-ink-950"
-          >
-            {t("home.viewAllCafes")}
-            {allCafes.data?.cafes.length ? (
-              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs tabular-nums group-hover:bg-ink-950/20">
-                {allCafes.data.cafes.length}
-              </span>
-            ) : null}
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
-
-        {geoError ? (
-          <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-ink-500">
-            {geoError === "unsupported" ? t("map.geoUnsupported") : t("map.needLocation")}
-          </p>
-        ) : loadingNearby ? (
-          <CafeGridSkeleton count={NEARBY_LIMIT} />
-        ) : nearby.error ? (
-          <p className="text-status-reserved">{t("home.loadError")}</p>
-        ) : cafes.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-ink-700 p-8 text-center text-ink-500">
-            {t("map.nearEmpty", { r: NEARBY_RADIUS_KM })}
-          </p>
-        ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {cafes.map((cafe) => (
-              <CafeCard key={cafe.id} cafe={cafe} />
-            ))}
-          </div>
-        )}
-      </section>
+        <CafeRow
+          title={t("home.cheapestTitle")}
+          href="/search?sort=price_asc"
+          cafes={cheapest.data?.cafes ?? []}
+          loading={cheapest.isLoading}
+          origin={center}
+          emptyMessage={cheapest.error ? t("home.loadError") : null}
+        />
+      </div>
 
       {allCafes.data?.cafes.length ? (
         <section className="space-y-4">
           <h2 className="font-display text-2xl text-ink-100">{t("home.mapTitle")}</h2>
-          <CafesMap
-            cafes={allCafes.data.cafes}
-            center={center}
-            radiusKm={NEARBY_RADIUS_KM}
-            className="h-[420px]"
-          />
+          <CafesMap cafes={allCafes.data.cafes} center={center} className="h-[420px]" />
         </section>
       ) : null}
 

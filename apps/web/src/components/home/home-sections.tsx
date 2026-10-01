@@ -1,64 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  Building2,
-  Gamepad2,
-  MapPinned,
-  Scale,
-  Search,
-  Wallet,
-  type LucideIcon,
-} from "lucide-react";
-import type { Cafe } from "@/lib/types";
-import { formatMnt } from "@/lib/utils";
+import { ArrowRight, Gamepad2, Scale, Search, type LucideIcon } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { useT } from "@/components/locale-provider";
 import { BrandMark } from "@/components/brand-logo";
-import { Skeleton } from "@/components/ui/skeleton";
-
-export function StatsStrip({ cafes, loading }: { cafes: Cafe[]; loading: boolean }) {
-  const t = useT();
-  const districts = new Set(cafes.map((c) => c.district).filter(Boolean)).size;
-  const prices = cafes.map((c) => c.pricePerHour).filter((p) => p > 0);
-  const minPrice = prices.length ? Math.min(...prices) : null;
-
-  const stats: { icon: LucideIcon; label: string; value: string }[] = [
-    { icon: Building2, label: t("home.statCafes"), value: String(cafes.length) },
-    { icon: MapPinned, label: t("home.statDistricts"), value: String(districts) },
-    {
-      icon: Wallet,
-      label: t("home.statFrom"),
-      value: minPrice === null ? "—" : formatMnt(minPrice),
-    },
-  ];
-
-  return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {stats.map(({ icon: Icon, label, value }) => (
-        <div
-          key={label}
-          className="flex items-center gap-3 rounded-2xl border border-ink-800 bg-ink-900/60 p-4"
-        >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-            <Icon className="h-5 w-5" />
-          </span>
-          <div className="min-w-0">
-            {loading ? (
-              <Skeleton className="mb-1 h-6 w-12" />
-            ) : (
-              <p className="font-display text-2xl font-semibold leading-tight text-ink-100 tabular-nums">
-                {value}
-              </p>
-            )}
-            <p className="truncate text-xs text-ink-500">{label}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export function HowItWorks() {
   const t = useT();
