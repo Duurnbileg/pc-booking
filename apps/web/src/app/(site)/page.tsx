@@ -11,7 +11,7 @@ import { useLocale } from "@/components/locale-provider";
 import { SearchBar } from "@/components/search-bar";
 import { CafesMap } from "@/components/maps/cafes-map";
 import { CafeRow } from "@/components/home/cafe-row";
-import { HowItWorks, OwnerCta } from "@/components/home/home-sections";
+import { OwnerCta } from "@/components/home/home-sections";
 import {
   getCurrentPosition,
   type LatLng,
@@ -134,8 +134,6 @@ function HomeContent() {
           <CafesMap cafes={allCafes.data.cafes} center={center} className="h-[420px]" />
         </section>
       ) : null}
-
-      <HowItWorks />
 
       <OwnerCta />
     </div>

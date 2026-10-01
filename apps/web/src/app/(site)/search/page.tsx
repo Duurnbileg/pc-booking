@@ -52,7 +52,11 @@ function SearchResults() {
       <SearchBar initial={search} />
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr] lg:items-start">
-        <SearchSidebar value={search} onChange={update} />
+        <SearchSidebar
+          value={search}
+          onChange={update}
+          resultCount={isLoading ? undefined : cafes.length}
+        />
 
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">

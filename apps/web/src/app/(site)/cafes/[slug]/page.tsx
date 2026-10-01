@@ -345,6 +345,11 @@ function CafeDescription({ text }: { text: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [overflowing, setOverflowing] = useState(false);
+  const [syncedText, setSyncedText] = useState(text);
+  if (text !== syncedText) {
+    setSyncedText(text);
+    setExpanded(false);
+  }
 
   useLayoutEffect(() => {
     const el = ref.current;

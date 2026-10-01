@@ -1,42 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Gamepad2, Scale, Search, type LucideIcon } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { useT } from "@/components/locale-provider";
 import { BrandMark } from "@/components/brand-logo";
-
-export function HowItWorks() {
-  const t = useT();
-  const steps: { icon: LucideIcon; title: string; body: string }[] = [
-    { icon: Search, title: t("home.step1Title"), body: t("home.step1Body") },
-    { icon: Scale, title: t("home.step2Title"), body: t("home.step2Body") },
-    { icon: Gamepad2, title: t("home.step3Title"), body: t("home.step3Body") },
-  ];
-
-  return (
-    <section className="space-y-5">
-      <h2 className="font-display text-2xl text-ink-100">{t("home.howTitle")}</h2>
-      <div className="grid gap-4 md:grid-cols-3">
-        {steps.map(({ icon: Icon, title, body }, i) => (
-          <div
-            key={title}
-            className="relative overflow-hidden rounded-2xl border border-ink-800 bg-ink-900/60 p-5"
-          >
-            <span className="pointer-events-none absolute -right-2 -top-4 font-display text-7xl font-bold text-ink-800/60">
-              {i + 1}
-            </span>
-            <span className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 text-accent ring-1 ring-accent/20">
-              <Icon className="h-5 w-5" />
-            </span>
-            <h3 className="relative mt-4 font-display text-lg text-ink-100">{title}</h3>
-            <p className="relative mt-1.5 text-sm leading-relaxed text-ink-300">{body}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 export function OwnerCta() {
   const t = useT();
