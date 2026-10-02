@@ -1,6 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import mongoose from "mongoose";
-import { CafeStatusSchema } from "@pc-booking/shared";
+import {
+  AdminCafeStatusSchema,
+  AssignableRoleSchema,
+  CafeStatusSchema,
+} from "@pc-booking/shared";
 import { Cafe, type CafeDocument } from "../models/Cafe.js";
 import { Integration } from "../models/Integration.js";
 import { PC } from "../models/PC.js";
@@ -15,6 +19,8 @@ import {
 export const adminRouter = Router();
 
 adminRouter.use(requireAuth, requireRoles("ADMIN"));
+
+const MANAGED_ROLES = { $in: AssignableRoleSchema.options };
 
 const DEFAULT_PAGE_SIZE = 20;
 const MAX_PAGE_SIZE = 100;
@@ -64,7 +70,7 @@ adminRouter.get("/stats", async (_req, res) => {
     Cafe.aggregate<{ _id: string; count: number }>([
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]),
-    User.countDocuments({ role: "CUSTOMER" }),
+    User.countDocuments({ role: MANAGED_ROLES }),
   ]);
   const byStatus = new Map(statusRows.map((r) => [r._id, r.count]));
   res.json({
@@ -169,9 +175,30 @@ adminRouter.post("/cafes/:id/suspend", async (req, res) => {
   res.json({ cafe: serializeCafe(cafe) });
 });
 
+adminRouter.patch("/cafes/:id/status", async (req, res) => {
+  const body = (req.body ?? {}) as { status?: unknown; reason?: unknown };
+  const parsed = AdminCafeStatusSchema.safeParse(body.status);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid status" });
+    return;
+  }
+  const cafe = await findCafeOr404(req, res);
+  if (!cafe) return;
+
+  cafe.status = parsed.data;
+  if (parsed.data !== "REJECTED") {
+    cafe.rejectionReason = "";
+  } else if (typeof body.reason === "string" && body.reason.trim()) {
+    cafe.rejectionReason = body.reason.trim().slice(0, 500);
+  }
+  await cafe.save();
+  const [serialized] = await withOwners([cafe]);
+  res.json({ cafe: serialized });
+});
+
 adminRouter.get("/customers", async (req, res) => {
   const { page, pageSize, skip } = pagination(req);
-  const filter: Record<string, unknown> = { role: "CUSTOMER" };
+  const filter: Record<string, unknown> = { role: MANAGED_ROLES };
 
   const digits = queryString(req.query.phone).replace(/\D/g, "");
   if (digits) {
@@ -197,10 +224,30 @@ adminRouter.get("/customers/:id", async (req, res) => {
     res.status(400).json({ error: "Invalid customer id" });
     return;
   }
-  const user = await User.findOne({ _id: req.params.id, role: "CUSTOMER" });
+  const user = await User.findOne({ _id: req.params.id, role: MANAGED_ROLES });
   if (!user) {
     res.status(404).json({ error: "Customer not found" });
     return;
   }
+  res.json({ customer: serializeCustomer(user) });
+});
+
+adminRouter.patch("/customers/:id/role", async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).json({ error: "Invalid customer id" });
+    return;
+  }
+  const parsed = AssignableRoleSchema.safeParse((req.body ?? {}).role);
+  if (!parsed.success) {
+    res.status(400).json({ error: "Invalid role" });
+    return;
+  }
+  const user = await User.findOne({ _id: req.params.id, role: MANAGED_ROLES });
+  if (!user) {
+    res.status(404).json({ error: "Customer not found" });
+    return;
+  }
+  user.role = parsed.data;
+  await user.save();
   res.json({ customer: serializeCustomer(user) });
 });

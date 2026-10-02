@@ -1,9 +1,11 @@
 import { Router } from "express";
 import mongoose from "mongoose";
 import {
+  BookingSlotSchema,
   CreateCafeSchema,
   DistrictSchema,
   UpdateCafeSchema,
+  bookingStartAt,
   pricingSummary,
   slugify,
   type CafePricing,
@@ -13,6 +15,7 @@ import { Cafe, type CafeDocument } from "../models/Cafe.js";
 import { PC } from "../models/PC.js";
 import { requireAuth, requireRoles } from "../middleware/auth.js";
 import { serializeCafe, serializePc } from "../utils/serialize.js";
+import { bookingEndAt, overlappingBookings } from "../utils/bookings.js";
 
 export const cafesRouter = Router();
 
@@ -223,7 +226,7 @@ cafesRouter.get("/", async (req, res) => {
   });
 });
 
-async function findApprovedCafe(idOrSlug: string) {
+export async function findApprovedCafe(idOrSlug: string) {
   const query = mongoose.isValidObjectId(idOrSlug)
     ? { $or: [{ _id: idOrSlug }, { slug: idOrSlug }] }
     : { slug: idOrSlug };
@@ -263,6 +266,26 @@ cafesRouter.get("/:idOrSlug/pcs", async (req, res) => {
       offline: count("OFFLINE") + count("MAINTENANCE"),
     },
   });
+});
+
+cafesRouter.get("/:idOrSlug/booked-seats", async (req, res) => {
+  const slot = BookingSlotSchema.safeParse(req.query);
+  if (!slot.success) {
+    res.status(400).json({ error: slot.error.issues[0]?.message ?? "Invalid slot" });
+    return;
+  }
+  const cafe = await findApprovedCafe(req.params.idOrSlug);
+  if (!cafe) {
+    res.status(404).json({ error: "Cafe not found" });
+    return;
+  }
+  const startAt = bookingStartAt(slot.data);
+  const bookings = await overlappingBookings(
+    cafe._id,
+    startAt,
+    bookingEndAt(startAt, slot.data.hours),
+  );
+  res.json({ seatIds: [...new Set(bookings.flatMap((b) => b.seats.map((s) => s.seatId)))] });
 });
 
 cafesRouter.post(

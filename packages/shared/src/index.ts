@@ -3,8 +3,16 @@ import { z } from "zod";
 export const UserRoleSchema = z.enum(["CUSTOMER", "CAFE_OWNER", "ADMIN"]);
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
+/** Roles an admin can assign; ADMIN is never granted through the UI. */
+export const AssignableRoleSchema = z.enum(["CUSTOMER", "CAFE_OWNER"]);
+export type AssignableRole = z.infer<typeof AssignableRoleSchema>;
+
 export const CafeStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED", "SUSPENDED"]);
 export type CafeStatus = z.infer<typeof CafeStatusSchema>;
+
+/** Statuses an admin can set directly; SUSPENDED remains only for legacy data. */
+export const AdminCafeStatusSchema = z.enum(["PENDING", "APPROVED", "REJECTED"]);
+export type AdminCafeStatus = z.infer<typeof AdminCafeStatusSchema>;
 
 export const PcStatusSchema = z.enum([
   "AVAILABLE",
@@ -150,6 +158,45 @@ export type CreateCafeInput = z.infer<typeof CreateCafeSchema>;
 export const UpdateCafeSchema = CreateCafeSchema.partial().omit({ pcs: true });
 export type UpdateCafeInput = z.infer<typeof UpdateCafeSchema>;
 
+export const BookingStatusSchema = z.enum(["CONFIRMED", "CANCELLED"]);
+export type BookingStatus = z.infer<typeof BookingStatusSchema>;
+
+export const SeatZoneSchema = z.enum(["hall", "vip"]);
+export type SeatZone = z.infer<typeof SeatZoneSchema>;
+
+export const MAX_BOOKING_SEATS = 20;
+export const MAX_BOOKING_HOURS = 12;
+
+const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date");
+const TimeStringSchema = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Invalid time");
+
+export const BookingSlotSchema = z.object({
+  date: DateStringSchema,
+  startTime: TimeStringSchema,
+  hours: z.coerce.number().int().min(1).max(MAX_BOOKING_HOURS),
+});
+export type BookingSlot = z.infer<typeof BookingSlotSchema>;
+
+export const CreateBookingSchema = BookingSlotSchema.extend({
+  cafe: z.string().min(1),
+  seats: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(100),
+        label: z.string().min(1).max(30),
+        zone: SeatZoneSchema,
+      }),
+    )
+    .min(1)
+    .max(MAX_BOOKING_SEATS),
+});
+export type CreateBookingInput = z.infer<typeof CreateBookingSchema>;
+
+/** Gaming centers operate on Ulaanbaatar time (UTC+8, no DST). */
+export function bookingStartAt({ date, startTime }: Pick<BookingSlot, "date" | "startTime">): Date {
+  return new Date(`${date}T${startTime}:00+08:00`);
+}
+
 export const PublicUserSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -170,6 +217,12 @@ export const API_PATHS = {
     list: "/api/cafes",
     byId: (idOrSlug: string) => `/api/cafes/${idOrSlug}`,
     pcs: (idOrSlug: string) => `/api/cafes/${idOrSlug}/pcs`,
+    bookedSeats: (idOrSlug: string) => `/api/cafes/${idOrSlug}/booked-seats`,
+  },
+  bookings: {
+    create: "/api/bookings",
+    mine: "/api/bookings/me",
+    cancel: (id: string) => `/api/bookings/${id}/cancel`,
   },
   admin: {
     approveCafe: (id: string) => `/api/admin/cafes/${id}/approve`,
@@ -177,15 +230,18 @@ export const API_PATHS = {
     suspendCafe: (id: string) => `/api/admin/cafes/${id}/suspend`,
     deleteCafe: (id: string) => `/api/admin/cafes/${id}`,
     cafeById: (id: string) => `/api/admin/cafes/${id}`,
+    cafeStatus: (id: string) => `/api/admin/cafes/${id}/status`,
     pendingCafes: "/api/admin/cafes/pending",
     cafes: "/api/admin/cafes",
     stats: "/api/admin/stats",
     customers: "/api/admin/customers",
     customerById: (id: string) => `/api/admin/customers/${id}`,
+    customerRole: (id: string) => `/api/admin/customers/${id}/role`,
   },
   upload: "/api/upload",
   owner: {
     myCafes: "/api/owner/cafes",
+    bookings: "/api/owner/bookings",
   },
 } as const;
 

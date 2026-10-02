@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState, type ReactNode } from "react";
-import { API_PATHS, type UserRole } from "@pc-booking/shared";
+import { API_PATHS } from "@pc-booking/shared";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
 import type { PublicUser } from "@/lib/types";
@@ -17,7 +17,6 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("CUSTOMER");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -33,11 +32,10 @@ export default function RegisterPage() {
           email,
           phone: phone || undefined,
           password,
-          role: role === "CAFE_OWNER" ? "CAFE_OWNER" : "CUSTOMER",
         }),
       });
       setUser(data.user);
-      router.push(role === "CAFE_OWNER" ? "/owner/cafes/new" : "/");
+      router.push("/");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("auth.registerFailed"));
     } finally {
@@ -83,16 +81,6 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="field"
           />
-        </Field>
-        <Field label={t("auth.roleLabel")}>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as UserRole)}
-            className="field"
-          >
-            <option value="CUSTOMER">{t("auth.roleCustomer")}</option>
-            <option value="CAFE_OWNER">{t("auth.roleOwner")}</option>
-          </select>
         </Field>
         {error ? <p className="text-sm text-status-reserved">{error}</p> : null}
         <button

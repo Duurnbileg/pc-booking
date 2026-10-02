@@ -25,6 +25,7 @@ export function CustomerDetailsDrawer({
         <DetailSection title={t("dash.customerDetails")}>
           <DetailRow label={t("dash.phone")} value={customer.phone} />
           <DetailRow label={t("dash.email")} value={customer.email} />
+          <DetailRow label={t("dash.colRole")} value={t(`dash.role${customer.role}`)} />
           <DetailRow label={t("dash.registered")} value={formatDate(customer.createdAt, locale, true)} />
           <DetailRow
             label={t("dash.lastLogin")}
