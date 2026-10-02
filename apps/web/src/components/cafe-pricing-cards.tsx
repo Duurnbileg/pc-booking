@@ -2,6 +2,7 @@
 
 import { Crown, Gamepad2, MemoryStick, Monitor, Zap, type LucideIcon } from "lucide-react";
 import type { PricingTier } from "@pc-booking/shared";
+import { cafeSeatStats } from "@/lib/mock-seats";
 import type { Cafe } from "@/lib/types";
 import { cn, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -38,6 +39,7 @@ export const TIER_STYLES: Record<
 export function CafePricingCards({ cafe }: { cafe: Cafe }) {
   const { t } = useLocale();
   const { hall, vip } = cafe.pricing;
+  const { byZone } = cafeSeatStats(cafe);
   const hasTierSpecs = [hall, vip].some(
     (tier) => tier && TIER_SPECS.some((spec) => tier[spec.key]?.trim()),
   );
@@ -48,9 +50,10 @@ export function CafePricingCards({ cafe }: { cafe: Cafe }) {
         <TierCard
           variant="hall"
           tier={hall}
+          pcs={byZone.hall}
           legacySpecs={hasTierSpecs ? undefined : cafe.displaySpecs}
         />
-        {vip ? <TierCard variant="vip" tier={vip} /> : null}
+        {vip ? <TierCard variant="vip" tier={vip} pcs={byZone.vip} /> : null}
       </div>
     </section>
   );
@@ -59,10 +62,12 @@ export function CafePricingCards({ cafe }: { cafe: Cafe }) {
 function TierCard({
   variant,
   tier,
+  pcs,
   legacySpecs,
 }: {
   variant: TierVariant;
   tier: PricingTier;
+  pcs: number;
   legacySpecs?: string;
 }) {
   const { t } = useLocale();
@@ -94,9 +99,9 @@ function TierCard({
             {variant === "vip" ? <Crown className="h-4 w-4" /> : null}
             {t(variant === "vip" ? "cafe.vip" : "cafe.hall")}
           </h3>
-          {tier.pcs > 0 ? (
+          {pcs > 0 ? (
             <span className="rounded-full bg-ink-950/60 px-2 py-0.5 text-xs text-ink-300">
-              {t("home.pcs", { n: tier.pcs })}
+              {t("home.pcs", { n: pcs })}
             </span>
           ) : null}
         </div>

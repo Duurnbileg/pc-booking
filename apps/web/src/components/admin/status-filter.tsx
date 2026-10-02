@@ -1,12 +1,12 @@
 "use client";
 
-import type { CafeStatus } from "@pc-booking/shared";
+import { AdminCafeStatusSchema, type CafeStatus } from "@pc-booking/shared";
 import { useT } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 
 export type StatusFilterValue = CafeStatus | "ALL";
 
-const OPTIONS: StatusFilterValue[] = ["ALL", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
+const OPTIONS: StatusFilterValue[] = ["ALL", ...AdminCafeStatusSchema.options];
 
 export function StatusFilter({
   value,

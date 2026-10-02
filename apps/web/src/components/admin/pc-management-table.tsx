@@ -1,9 +1,9 @@
 "use client";
 
-import type { CafeStatus } from "@pc-booking/shared";
+import type { AdminCafeStatus, CafeStatus } from "@pc-booking/shared";
 import { Eye, Pencil, Trash2, type LucideIcon } from "lucide-react";
 import { useLocale } from "@/components/locale-provider";
-import { StatusBadge } from "@/components/admin/status-badge";
+import { StatusSelect } from "@/components/admin/status-badge";
 import { ApproveButton, RejectButton } from "@/components/admin/moderation-buttons";
 import { formatDate } from "@/components/admin/format";
 import type { AdminCafe } from "@/lib/types";
@@ -31,10 +31,12 @@ export function PcManagementTable({
   cafes,
   busyId,
   onAction,
+  onStatusChange,
 }: {
   cafes: AdminCafe[];
   busyId: string | null;
   onAction: (action: PcAction, cafe: AdminCafe) => void;
+  onStatusChange: (cafe: AdminCafe, status: AdminCafeStatus) => void;
 }) {
   const { t, locale } = useLocale();
   const th = "px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-slate-500";
@@ -87,7 +89,12 @@ export function PcManagementTable({
                 {formatMnt(cafe.pricePerHour)}
               </td>
               <td className="px-4 py-3">
-                <StatusBadge status={cafe.status} />
+                <StatusSelect
+                  status={cafe.status}
+                  label={`${t("dash.colStatus")}: ${cafe.name}`}
+                  disabled={busyId === cafe.id}
+                  onChange={(status) => onStatusChange(cafe, status)}
+                />
               </td>
               <td className="whitespace-nowrap px-4 py-3 text-slate-500">
                 {formatDate(cafe.createdAt, locale)}

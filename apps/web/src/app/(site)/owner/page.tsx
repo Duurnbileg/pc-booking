@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import { useAuth } from "@/components/auth-provider";
-import type { Cafe } from "@/lib/types";
+import type { Booking, Cafe } from "@/lib/types";
 import { formatMnt } from "@/lib/utils";
 import { useT } from "@/components/locale-provider";
+import { BookingRow } from "@/components/booking-row";
 import { ListRowsSkeleton, PageSkeleton } from "@/components/skeletons";
 
 export default function OwnerCafesPage() {
@@ -17,16 +18,31 @@ export default function OwnerCafesPage() {
   const router = useRouter();
   const t = useT();
 
+  const [justCreated, setJustCreated] = useState(false);
+
   useEffect(() => {
     if (!loading && (!user || (user.role !== "CAFE_OWNER" && user.role !== "ADMIN"))) {
       router.replace("/login");
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("created") === "1") {
+      setJustCreated(true);
+      router.replace("/owner", { scroll: false });
+    }
+  }, [router]);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["owner-cafes"],
     enabled: Boolean(user && (user.role === "CAFE_OWNER" || user.role === "ADMIN")),
     queryFn: () => api<{ cafes: Cafe[] }>(API_PATHS.owner.myCafes),
+  });
+
+  const bookingsQuery = useQuery({
+    queryKey: ["owner-bookings"],
+    enabled: Boolean(user && (user.role === "CAFE_OWNER" || user.role === "ADMIN")),
+    queryFn: () => api<{ bookings: Booking[] }>(API_PATHS.owner.bookings),
   });
 
   if (loading || !user) {
@@ -44,6 +60,12 @@ export default function OwnerCafesPage() {
           {t("owner.addCafe")}
         </Link>
       </div>
+
+      {justCreated ? (
+        <p className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-ink-100">
+          {t("owner.createdNotice")}
+        </p>
+      ) : null}
 
       {isLoading ? (
         <ListRowsSkeleton rows={3} />
@@ -66,10 +88,13 @@ export default function OwnerCafesPage() {
                   {cafe.name}
                 </Link>
                 <p className="text-sm text-ink-500">
-                  {cafe.status} · {t("home.pcs", { n: cafe.pcCount ?? 0 })} ·{" "}
+                  {t(`dash.status${cafe.status}`)} · {t("home.pcs", { n: cafe.pcCount ?? 0 })} ·{" "}
                   {formatMnt(cafe.pricePerHour)}
                   {t("home.perHour")}
                 </p>
+                {cafe.status === "PENDING" ? (
+                  <p className="mt-1 text-sm text-accent">{t("owner.pendingHint")}</p>
+                ) : null}
                 {cafe.status === "REJECTED" && cafe.rejectionReason ? (
                   <p className="mt-1 text-sm text-status-reserved">
                     {t("owner.rejectionReason")} {cafe.rejectionReason}
@@ -86,6 +111,23 @@ export default function OwnerCafesPage() {
           ))}
         </ul>
       )}
+
+      <section className="space-y-2">
+        <h2 className="font-display text-2xl">{t("booking.ownerTitle")}</h2>
+        {bookingsQuery.isLoading ? (
+          <ListRowsSkeleton rows={2} />
+        ) : bookingsQuery.error ? (
+          <p className="text-status-reserved">{t("booking.loadFailed")}</p>
+        ) : !bookingsQuery.data?.bookings.length ? (
+          <p className="text-ink-500">{t("booking.ownerEmpty")}</p>
+        ) : (
+          <ul className="divide-y divide-ink-800 border-y border-ink-800">
+            {bookingsQuery.data.bookings.map((booking) => (
+              <BookingRow key={booking.id} booking={booking} />
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

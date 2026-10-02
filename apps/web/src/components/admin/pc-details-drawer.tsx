@@ -3,11 +3,11 @@
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { API_PATHS } from "@pc-booking/shared";
+import { API_PATHS, type AdminCafeStatus } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import { useLocale } from "@/components/locale-provider";
 import { Drawer } from "@/components/admin/drawer";
-import { StatusBadge } from "@/components/admin/status-badge";
+import { StatusBadge, StatusSelect } from "@/components/admin/status-badge";
 import { ApproveButton, RejectButton } from "@/components/admin/moderation-buttons";
 import { ErrorState } from "@/components/admin/admin-states";
 import { formatDate } from "@/components/admin/format";
@@ -19,11 +19,13 @@ export function PcDetailsDrawer({
   cafe: initial,
   onClose,
   onAction,
+  onStatusChange,
   busy,
 }: {
   cafe: AdminCafe | null;
   onClose: () => void;
   onAction: (action: "approve" | "reject" | "delete" | "edit", cafe: AdminCafe) => void;
+  onStatusChange?: (cafe: AdminCafe, status: AdminCafeStatus) => void;
   busy?: boolean;
 }) {
   const { t, locale } = useLocale();
@@ -74,7 +76,16 @@ export function PcDetailsDrawer({
       ) : cafe ? (
         <div className="space-y-6">
           <div className="flex items-center gap-2">
-            <StatusBadge status={cafe.status} />
+            {onStatusChange ? (
+              <StatusSelect
+                status={cafe.status}
+                label={t("dash.colStatus")}
+                disabled={busy}
+                onChange={(status) => onStatusChange(cafe, status)}
+              />
+            ) : (
+              <StatusBadge status={cafe.status} />
+            )}
             <span className="text-xs text-slate-500">
               {t("dash.created")}: {formatDate(cafe.createdAt, locale, true)}
             </span>

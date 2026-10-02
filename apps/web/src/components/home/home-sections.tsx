@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { useT } from "@/components/locale-provider";
 import { BrandMark } from "@/components/brand-logo";
@@ -18,17 +18,34 @@ export function OwnerCta() {
         <div className="flex items-start gap-4">
           <BrandMark size={48} className="hidden sm:block" />
           <div className="space-y-1.5">
-            <h2 className="font-display text-2xl text-ink-100 sm:text-3xl">{t("home.ctaTitle")}</h2>
-            <p className="max-w-lg text-ink-300">{t("home.ctaBody")}</p>
+            <h2 className="font-display text-2xl text-ink-100 sm:text-3xl">
+              {canList ? t("owner.homeCtaTitle") : t("home.ctaTitle")}
+            </h2>
+            <p className="max-w-lg text-ink-300">
+              {canList ? t("owner.homeCtaHint") : t("home.ctaBody")}
+            </p>
+            {!canList ? (
+              <p className="max-w-lg text-sm text-ink-500">{t("home.ctaOwnerRoleHint")}</p>
+            ) : null}
           </div>
         </div>
-        <Link
-          href={canList ? "/owner/cafes/new" : "/register"}
-          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-5 py-3 font-medium text-ink-950 transition hover:bg-accent-dim"
-        >
-          {t("home.ctaButton")}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        {canList ? (
+          <Link
+            href="/owner/cafes/new"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-5 py-3 font-medium text-ink-950 transition hover:bg-accent-dim"
+          >
+            <Plus className="h-4 w-4" />
+            {t("nav.addPc")}
+          </Link>
+        ) : !user ? (
+          <Link
+            href="/register"
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-5 py-3 font-medium text-ink-950 transition hover:bg-accent-dim"
+          >
+            {t("home.ctaButton")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        ) : null}
       </div>
     </section>
   );

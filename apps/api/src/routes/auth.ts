@@ -19,24 +19,21 @@ authRouter.post("/register", async (req, res) => {
     return;
   }
 
-  const { name, email, phone, password, role } = parsed.data;
+  const { name, email, phone, password } = parsed.data;
   const existing = await User.findOne({ email: email.toLowerCase() });
   if (existing) {
     res.status(409).json({ error: "Email already registered" });
     return;
   }
 
-  // Only allow CUSTOMER or CAFE_OWNER via public register; ADMIN via seed only
-  const safeRole =
-    role === "CAFE_OWNER" ? "CAFE_OWNER" : role === "ADMIN" ? "CUSTOMER" : "CUSTOMER";
-
+  // Everyone starts as CUSTOMER; only an admin can grant CAFE_OWNER, and ADMIN comes from seed.
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await User.create({
     name,
     email: email.toLowerCase(),
     phone,
     passwordHash,
-    role: safeRole,
+    role: "CUSTOMER",
   });
 
   const token = signToken(user);

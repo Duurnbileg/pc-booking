@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { API_PATHS, type AssignableRole } from "@pc-booking/shared";
+import { api, ApiError } from "@/lib/api";
 import { useT } from "@/components/locale-provider";
+import { useToast } from "@/components/admin/toast";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { StatCard } from "@/components/admin/stat-card";
 import { SearchInput } from "@/components/admin/search-input";
@@ -11,7 +15,7 @@ import { EmptyState, ErrorState, TableSkeleton } from "@/components/admin/admin-
 import { CustomerTable } from "@/components/admin/customer-table";
 import { CustomerDetailsDrawer } from "@/components/admin/customer-details-drawer";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
-import { useAdminCustomers, useAdminStats } from "@/hooks/use-admin-queries";
+import { ADMIN_KEYS, useAdminCustomers, useAdminStats } from "@/hooks/use-admin-queries";
 import type { AdminCustomer } from "@/lib/types";
 
 export default function AdminCustomersPage() {
@@ -26,6 +30,26 @@ export default function AdminCustomersPage() {
   const stats = useAdminStats();
   const customers = useAdminCustomers({ phone: debouncedPhone || undefined, page });
   const data = customers.data;
+
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const roleMutation = useMutation({
+    mutationFn: ({ customer, role }: { customer: AdminCustomer; role: AssignableRole }) =>
+      api<{ customer: AdminCustomer }>(API_PATHS.admin.customerRole(customer.id), {
+        method: "PATCH",
+        body: JSON.stringify({ role }),
+      }),
+    onSuccess: async ({ customer }) => {
+      toast.success(
+        t("dash.roleChangedToast", { name: customer.name, role: t(`dash.role${customer.role}`) }),
+      );
+      if (viewing?.id === customer.id) setViewing(customer);
+      await queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.customers });
+    },
+    onError: (err) => {
+      toast.error(err instanceof ApiError ? err.message : t("dash.actionFailed"));
+    },
+  });
 
   return (
     <>
@@ -51,7 +75,7 @@ export default function AdminCustomersPage() {
         </div>
 
         {customers.isLoading ? (
-          <TableSkeleton rows={6} cols={3} />
+          <TableSkeleton rows={6} cols={4} />
         ) : customers.error ? (
           <ErrorState error={customers.error} onRetry={() => void customers.refetch()} />
         ) : !data?.customers.length ? (
@@ -61,7 +85,12 @@ export default function AdminCustomersPage() {
           />
         ) : (
           <>
-            <CustomerTable customers={data.customers} onView={setViewing} />
+            <CustomerTable
+              customers={data.customers}
+              busyId={roleMutation.isPending ? roleMutation.variables?.customer.id ?? null : null}
+              onView={setViewing}
+              onRoleChange={(customer, role) => roleMutation.mutate({ customer, role })}
+            />
             <Pagination
               page={data.page}
               pageSize={data.pageSize}

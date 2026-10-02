@@ -17,6 +17,7 @@ import {
 import { API_PATHS } from "@pc-booking/shared";
 import { api } from "@/lib/api";
 import type { Cafe } from "@/lib/types";
+import { cafeSeatStats } from "@/lib/mock-seats";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
 import { PcSeatMap } from "@/components/pc-seat-map";
@@ -56,7 +57,7 @@ export default function CafeDetailPage() {
   const address = cafe.address.replace(/^\s*хаяг\s*:\s*/i, "").trim();
   const { hall, vip } = cafe.pricing;
   const minPrice = Math.min(hall.price, vip?.price ?? Infinity);
-  const totalPcs = cafe.pcCount ?? 0;
+  const { total: totalPcs, available: availablePcs } = cafeSeatStats(cafe);
 
   return (
     <div className="space-y-6">
@@ -79,6 +80,7 @@ export default function CafeDetailPage() {
               cafe={cafe}
               minPrice={minPrice}
               totalPcs={totalPcs}
+              availablePcs={availablePcs}
               position={position}
               address={address}
             />
@@ -103,7 +105,7 @@ export default function CafeDetailPage() {
                   .join(" · ")}
               </p>
             </div>
-            <HighlightStats cafe={cafe} minPrice={minPrice} totalPcs={totalPcs} />
+            <HighlightStats minPrice={minPrice} totalPcs={totalPcs} availablePcs={availablePcs} />
           </section>
 
           <FeatureList cafe={cafe} />
@@ -166,16 +168,15 @@ function ShareButton({ title }: { title: string }) {
 }
 
 function HighlightStats({
-  cafe,
   minPrice,
   totalPcs,
+  availablePcs: available,
 }: {
-  cafe: Cafe;
   minPrice: number;
   totalPcs: number;
+  availablePcs: number | null;
 }) {
   const { t } = useLocale();
-  const available = cafe.availablePcs;
   const stats: { value: string; label: string; tone?: string }[] = [
     ...(typeof available === "number"
       ? [
@@ -260,12 +261,14 @@ function BookingCard({
   cafe,
   minPrice,
   totalPcs,
+  availablePcs,
   position,
   address,
 }: {
   cafe: Cafe;
   minPrice: number;
   totalPcs: number;
+  availablePcs: number | null;
   position: LatLng | null;
   address: string;
 }) {
@@ -280,18 +283,21 @@ function BookingCard({
           </span>{" "}
           {t("home.perHour")}
         </p>
-        <AvailabilityBadge available={cafe.availablePcs} total={totalPcs} />
+        <AvailabilityBadge available={availablePcs} total={totalPcs} />
       </div>
 
       <div className="space-y-2">
-        <button
-          type="button"
-          disabled
-          className="w-full cursor-not-allowed rounded-xl bg-accent py-3 font-medium text-ink-950 opacity-60"
+        <a
+          href="#seats"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("seats")?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="block w-full rounded-xl bg-accent py-3 text-center font-medium text-ink-950 transition hover:bg-accent-dim"
         >
-          {t("cafe.bookSoon")}
-        </button>
-        <p className="text-center text-xs text-ink-500">{t("cafe.bookingSoonHint")}</p>
+          {t("booking.pickSeats")}
+        </a>
+        <p className="text-center text-xs text-ink-500">{t("booking.pickSeatsHint")}</p>
       </div>
 
       {cafe.phone || position ? (

@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { AdvancedMarker, Circle, ColorScheme, Map, useMap } from "@vis.gl/react-google-maps";
 import { ArrowRight, MapPin, Navigation } from "lucide-react";
 import { AvailabilityBadge } from "@/components/availability-badge";
+import { cafeSeatStats } from "@/lib/mock-seats";
 import type { Cafe } from "@/lib/types";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -139,6 +140,7 @@ function CafeHoverCard({ cafe, distanceKm }: { cafe: Cafe; distanceKm?: number }
   const { t, locale } = useLocale();
   const cover = cafe.images?.[0];
   const district = cafe.district ? districtLabel(cafe.district, locale) : "";
+  const seatStats = cafeSeatStats(cafe);
   const ref = useRef<HTMLAnchorElement>(null);
   const [placement, setPlacement] = useState({ below: false, shiftX: 0 });
 
@@ -183,8 +185,8 @@ function CafeHoverCard({ cafe, distanceKm }: { cafe: Cafe; distanceKm?: number }
       <div className="space-y-2 p-3">
         <div className="flex flex-wrap gap-1.5 text-[11px] text-ink-100">
           <AvailabilityBadge
-            available={cafe.availablePcs}
-            total={cafe.pcCount ?? 0}
+            available={seatStats.available}
+            total={seatStats.total}
             className="px-2 py-0.5 text-[11px]"
           />
           {district ? (

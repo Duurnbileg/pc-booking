@@ -1,9 +1,12 @@
 import type {
+  AssignableRole,
+  BookingStatus,
   CafeStatus,
   District,
   OpeningHours,
   PcStatus,
   PricingTier,
+  SeatZone,
   UserRole,
 } from "@pc-booking/shared";
 
@@ -66,6 +69,7 @@ export type AdminCustomer = {
   name: string;
   email: string;
   phone: string | null;
+  role: AssignableRole;
   createdAt: string;
   lastLoginAt: string | null;
 };
@@ -76,6 +80,19 @@ export type Paginated<K extends string, T> = {
   total: number;
   page: number;
   pageSize: number;
+};
+
+export type Booking = {
+  id: string;
+  cafe: { id: string; name: string; slug: string };
+  seats: { id: string; label: string; zone: SeatZone }[];
+  startAt: string;
+  endAt: string;
+  hours: number;
+  totalPrice: number;
+  status: BookingStatus;
+  createdAt: string;
+  customer?: { name: string; phone: string | null; email: string };
 };
 
 export type CafePc = {

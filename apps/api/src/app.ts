@@ -8,6 +8,7 @@ import { cafesRouter } from "./routes/cafes.js";
 import { adminRouter } from "./routes/admin.js";
 import { ownerRouter } from "./routes/owner.js";
 import { uploadRouter } from "./routes/upload.js";
+import { bookingsRouter } from "./routes/bookings.js";
 import { optionalAuth } from "./middleware/auth.js";
 
 export function createApp(): express.Express {
@@ -42,6 +43,7 @@ export function createApp(): express.Express {
   app.use("/api/admin", adminRouter);
   app.use("/api/owner", ownerRouter);
   app.use("/api/upload", uploadRouter);
+  app.use("/api/bookings", bookingsRouter);
 
   app.use(
     (

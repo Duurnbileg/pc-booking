@@ -1,6 +1,10 @@
 "use client";
 
-import type { CafeStatus } from "@pc-booking/shared";
+import {
+  AdminCafeStatusSchema,
+  type AdminCafeStatus,
+  type CafeStatus,
+} from "@pc-booking/shared";
 import { useT } from "@/components/locale-provider";
 import { cn } from "@/lib/utils";
 
@@ -23,5 +27,48 @@ export function StatusBadge({ status }: { status: CafeStatus }) {
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {t(`dash.status${status}`)}
     </span>
+  );
+}
+
+/** Status picker styled like StatusBadge; a legacy SUSPENDED value is shown but not selectable. */
+export function StatusSelect({
+  status,
+  label,
+  disabled,
+  onChange,
+}: {
+  status: CafeStatus;
+  label: string;
+  disabled?: boolean;
+  onChange: (status: AdminCafeStatus) => void;
+}) {
+  const t = useT();
+  return (
+    <select
+      value={status}
+      disabled={disabled}
+      aria-label={label}
+      title={t("dash.changeStatus")}
+      onClick={(e) => e.stopPropagation()}
+      onChange={(e) => {
+        const next = AdminCafeStatusSchema.safeParse(e.target.value);
+        if (next.success && next.data !== status) onChange(next.data);
+      }}
+      className={cn(
+        "cursor-pointer rounded-full py-0.5 pl-2 pr-6 text-xs font-medium ring-1 ring-inset focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-wait disabled:opacity-50",
+        STYLES[status],
+      )}
+    >
+      {status === "SUSPENDED" ? (
+        <option value="SUSPENDED" disabled>
+          {t("dash.statusSUSPENDED")}
+        </option>
+      ) : null}
+      {AdminCafeStatusSchema.options.map((option) => (
+        <option key={option} value={option}>
+          {t(`dash.status${option}`)}
+        </option>
+      ))}
+    </select>
   );
 }

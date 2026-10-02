@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
 import { useT } from "@/components/locale-provider";
 import { LocaleMenu } from "@/components/locale-menu";
@@ -17,9 +18,18 @@ export function SiteHeader() {
           <BrandLogo />
         </Link>
         <nav className="flex items-center gap-3 text-sm text-ink-300">
+          {user ? (
+            <Link href="/bookings" className="hover:text-ink-100 transition">
+              {t("nav.myBookings")}
+            </Link>
+          ) : null}
           {user?.role === "CAFE_OWNER" || user?.role === "ADMIN" ? (
-            <Link href="/owner/cafes/new" className="hover:text-ink-100 transition">
-              {t("nav.addCafe")}
+            <Link
+              href="/owner/cafes/new"
+              className="inline-flex items-center gap-1 rounded-md bg-accent px-3 py-1.5 font-medium text-ink-950 transition hover:bg-accent-dim"
+            >
+              <Plus className="h-4 w-4" />
+              {t("nav.addPc")}
             </Link>
           ) : null}
           {user?.role === "CAFE_OWNER" || user?.role === "ADMIN" ? (

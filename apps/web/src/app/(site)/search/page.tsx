@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { API_PATHS, CAFE_SORTS, type CafeSort } from "@pc-booking/shared";
 import { api } from "@/lib/api";
+import { cafeSeatStats } from "@/lib/mock-seats";
 import type { Cafe } from "@/lib/types";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { parseSearch, searchToParams, todayIso, type CafeSearch } from "@/lib/search";
@@ -115,8 +116,7 @@ function SearchResults() {
 function ResultCard({ cafe, live }: { cafe: Cafe; live: boolean }) {
   const { t, locale } = useLocale();
   const cover = cafe.images?.[0];
-  const total = cafe.pcCount ?? 0;
-  const available = cafe.availablePcs;
+  const { total, available } = cafeSeatStats(cafe);
   const district = districtLabel(cafe.district, locale);
 
   return (

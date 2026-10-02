@@ -46,7 +46,7 @@ export default function NewCafePage() {
         body: JSON.stringify(payload),
       });
       revokePending(form.pendingImages);
-      router.push(`/owner/cafes/${data.cafe.id}`);
+      router.push(data.cafe.status === "PENDING" ? "/owner?created=1" : `/owner/cafes/${data.cafe.id}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("owner.createFailed"));
     } finally {

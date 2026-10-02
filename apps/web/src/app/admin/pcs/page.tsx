@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { CafeStatusSchema } from "@pc-booking/shared";
+import { AdminCafeStatusSchema } from "@pc-booking/shared";
 import { useT } from "@/components/locale-provider";
 import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { SearchInput } from "@/components/admin/search-input";
@@ -36,7 +36,7 @@ function AdminPcsContent() {
   const pathname = usePathname();
   const params = useSearchParams();
 
-  const parsedStatus = CafeStatusSchema.safeParse(params.get("status"));
+  const parsedStatus = AdminCafeStatusSchema.safeParse(params.get("status"));
   const status: StatusFilterValue = parsedStatus.success ? parsedStatus.data : "ALL";
   const page = Math.max(1, Number(params.get("page")) || 1);
   const [search, setSearch] = useState(params.get("search") ?? "");
@@ -125,6 +125,7 @@ function AdminPcsContent() {
               cafes={data.cafes}
               busyId={moderation.busyId}
               onAction={onAction}
+              onStatusChange={moderation.setStatus}
             />
             <Pagination
               page={data.page}
@@ -140,6 +141,7 @@ function AdminPcsContent() {
         cafe={viewing}
         onClose={() => setViewing(null)}
         busy={Boolean(viewing && moderation.busyId === viewing.id)}
+        onStatusChange={moderation.setStatus}
         onAction={(action, cafe) => {
           if (action === "edit") {
             setViewing(null);

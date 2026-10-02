@@ -9,6 +9,7 @@ export function serializeCustomer(user: UserDocument) {
     name: user.name,
     email: user.email,
     phone: user.phone ?? null,
+    role: user.role,
     createdAt: user.createdAt,
     lastLoginAt: user.lastLoginAt ?? null,
   };

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { cafeSeatStats } from "@/lib/mock-seats";
 import type { Cafe } from "@/lib/types";
 import { cn, districtLabel, formatMnt } from "@/lib/utils";
 import { useLocale } from "@/components/locale-provider";
@@ -103,7 +104,7 @@ export function CafeRow({ title, href, cafes, loading, emptyMessage, origin }: C
 function CafeTile({ cafe, origin }: { cafe: Cafe; origin?: LatLng | null }) {
   const { t, locale } = useLocale();
   const cover = cafe.images?.[0];
-  const available = cafe.availablePcs;
+  const { available } = cafeSeatStats(cafe);
   const meta = cafe.district ? districtLabel(cafe.district, locale) : "";
   const position = cafeLatLng(cafe.location);
   const distanceKm =
