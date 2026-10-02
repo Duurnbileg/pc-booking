@@ -66,13 +66,15 @@ export default function MyBookingsPage() {
             <p className="text-sm text-status-reserved">{t("booking.cancelFailed")}</p>
           ) : null}
           {[
-            { title: t("booking.upcoming"), items: upcoming },
-            { title: t("booking.past"), items: past },
+            { key: "upcoming", title: null, items: upcoming },
+            { key: "past", title: t("booking.past"), items: past },
           ]
             .filter((group) => group.items.length)
             .map((group) => (
-              <section key={group.title} className="space-y-2">
-                <h2 className="font-display text-xl text-ink-100">{group.title}</h2>
+              <section key={group.key} className="space-y-2">
+                {group.title ? (
+                  <h2 className="font-display text-xl text-ink-100">{group.title}</h2>
+                ) : null}
                 <ul className="divide-y divide-ink-800 border-y border-ink-800">
                   {group.items.map((booking) => (
                     <BookingRow
